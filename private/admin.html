@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Painel Administrativo - Copiadora</title>
+  <link rel="stylesheet" href="/private/admin-style.css">
+  <script src="https://kit.fontawesome.com/a2e0e6f9d2.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="admin-container">
+    <aside class="sidebar">
+      <div class="brand">
+        <i class="fa-solid fa-print"></i>
+        <h2>Copiadora</h2>
+      </div>
+      <nav>
+        <a href="#" class="active" data-section="config"><i class="fa-solid fa-sliders"></i> Configurações</a>
+        <a href="#" data-section="reports"><i class="fa-solid fa-chart-line"></i> Relatórios</a>
+        <a href="#"><i class="fa-solid fa-users"></i> Usuários</a>
+        <a href="#"><i class="fa-solid fa-gear"></i> Sistema</a>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <header class="content-header">
+        <h1><i class="fa-solid fa-gears"></i> Painel Administrativo</h1>
+        <p>Gerencie facilmente os valores de impressão e mantenha o sistema atualizado</p>
+      </header>
+
+      <section class="card">
+        <h2><i class="fa-solid fa-print"></i> Configurações de Impressão</h2>
+
+        <!-- Bloco A4 -->
+        <div class="paper-card">
+          <h3><i class="fa-solid fa-file-lines"></i> Papel A4</h3>
+          <div class="form-grid">
+            <div class="input-group">
+              <label>Preto e Branco (R$)</label>
+              <input type="number" id="a4PretoBranco" step="0.01" placeholder="Ex: 0.50">
+            </div>
+
+            <div class="input-group">
+              <label>Colorido (R$)</label>
+              <input type="number" id="a4Colorido" step="0.01" placeholder="Ex: 1.00">
+            </div>
+          </div>
+        </div>
+
+        <!-- Bloco A3 -->
+        <div class="paper-card">
+          <h3><i class="fa-solid fa-file-lines"></i> Papel A3</h3>
+          <div class="form-grid">
+            <div class="input-group">
+              <label>Preto e Branco (R$)</label>
+              <input type="number" id="a3PretoBranco" step="0.01" placeholder="Ex: 1.00">
+            </div>
+
+            <div class="input-group">
+              <label>Colorido (R$)</label>
+              <input type="number" id="a3Colorido" step="0.01" placeholder="Ex: 2.00">
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-actions">
+          <button id="salvar"><i class="fa-solid fa-floppy-disk"></i> Salvar Configurações</button>
+        </div>
+        <p id="statusMsg"></p>
+      </section>
+
+      <!-- Seção de Relatórios -->
+      <section class="card" id="reports-section" style="display: none;">
+        <h2><i class="fa-solid fa-chart-line"></i> Relatórios</h2>
+        <div class="reports-grid">
+          <div class="report-card">
+            <h3><i class="fa-solid fa-clock-rotate-left"></i> Histórico de Impressões</h3>
+            <p>Visualize o histórico completo de todas as impressões realizadas no sistema.</p>
+            <button id="verHistorico" onclick="window.open('/private/historic_screen/historic.html', '_blank')">
+              <i class="fa-solid fa-external-link-alt"></i> Ver Histórico
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <p>© 2025 Copiadora Inteligente — Sistema de Impressão Automatizada</p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="/private/admin-script.js"></script>
+</body>
+</html>

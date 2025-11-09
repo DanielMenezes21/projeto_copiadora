@@ -1,0 +1,31 @@
+{
+  "name": "projeto-copiadora",
+  "version": "1.0.0",
+  "description": "um projeto cujo o objetivo, de forma resumida, é solicitar impressões e fazer um auto atendimento",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DanielMenezes21/projeto_copiadora.git"
+  },
+  "keywords": [
+    "Stonegiant19"
+  ],
+  "author": "DanielMenezes",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DanielMenezes21/projeto_copiadora/issues"
+  },
+  "homepage": "https://github.com/DanielMenezes21/projeto_copiadora#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "multer": "^1.4.5-lts.2",
+    "pdf-parse": "^1.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

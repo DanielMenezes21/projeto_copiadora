@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Histórico de Impressões</title>
+  <link rel="stylesheet" href="/private/historic_screen/historic.css">
+</head>
+<body>
+  <div class="historic-container">
+    <header>
+      <h1>Histórico de Impressões</h1>
+      <p>Lista de pedidos realizados (ID, Código, Data/Hora)</p>
+      <div class="actions">
+        <button id="btnRefresh">Atualizar</button>
+        <button id="btnClose" onclick="window.close()">Fechar</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- Modal de Detalhes -->
+    <div id="modalDetalhes" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Detalhes da Impressão</h2>
+        <div id="detalhesConteudo"></div>
+      </div>
+    </div>
+
+    <table id="historicTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Código</th>
+            <th>Documento</th>
+            <th>Valor</th>
+            <th>Data / Hora</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Linhas serão renderizadas pelo JS -->
+        </tbody>
+      </table>
+      <p id="emptyMsg" class="empty">Nenhum registro encontrado.</p>
+    </main>
+  </div>
+
+  <script src="/private/historic_screen/historic.js"></script>
+</body>
+</html>

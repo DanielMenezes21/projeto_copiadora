@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "codigo": "IMP-1991BB",
+    "datetime": "2025-11-07T21:36:43.177Z",
+    "documento": "RESOLUÇÃO DO EXERCÍCIO - AULA 20 - 11 - 2025.pdf",
+    "valor": 6,
+    "configuracoes": {
+      "copias": 1,
+      "cor": "preto-branco",
+      "tamanho": "a4",
+      "paginas": 12,
+      "frenteVerso": false,
+      "orientacao": "retrato"
+    }
+  },
+  {
+    "id": 2,
+    "codigo": "IMP-5589TD",
+    "datetime": "2025-11-07T22:07:25.411Z",
+    "documento": "AVALIAÇÃO  A1-  -PESQUISA OPERACIONAL GABARITO  03-11-2025.pdf",
+    "valor": 0.95,
+    "configuracoes": {
+      "copias": 1,
+      "cor": "preto-branco",
+      "tamanho": "a4",
+      "paginas": 2,
+      "frenteVerso": true,
+      "orientacao": "retrato"
+    }
+  }
+]
