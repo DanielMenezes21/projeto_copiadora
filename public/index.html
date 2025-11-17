@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="style.css">
   <!-- Font Awesome para ícones -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
+ </head>
 <body>
   <header>
     <div class="logo">
@@ -17,10 +17,13 @@
       <button class="nav-btn"><i class="fa-solid fa-circle-info"></i> Sobre</button>
       <button class="nav-btn"><i class="fa-solid fa-headset"></i> Suporte</button>
     </nav>
+    
   </header>
-  <section class="hero-image">
+  
+    <section class="hero-image">
     <img src="image/logo1_copiadora.png" alt="Arte principal" />
   </section>
+  
   <main>
     <h1>Bem-vindo ao Sistema de Autoatendimento de Impressão</h1>
     <h2> 
@@ -30,6 +33,188 @@
       Envie seu arquivo, pague via pix e imprima em instantes. Simples, rápido e sem complicações
     </p>
   </main>
+
+<head>
+            
+<body>
+   
+</body>
+
+ <!-- espaçamento entre a linha e os banners -->
+ <!--
+📜 Explicação Detalhada do Código
+
+Este código cria 3 caixas (banners) para anúncios usando HTML e CSS, com layout responsivo e efeitos visuais.
+
+🔹 Estrutura HTML:
+- `<div class="banner-container">`: Contêiner flexível que organiza os banners lado a lado.
+- `<div class="banner">`: Cada banner individual, contendo:
+  
+  - `<div class="banner-content">`: Texto e botão de ação.
+
+🔹 Estilo CSS:
+- Uso de **Flexbox** para alinhamento responsivo.
+- **Sombras e bordas arredondadas** para estética moderna.
+- **Transição e transformação** para efeito de zoom ao passar o mouse.
+- **Botões estilizados** com mudança de cor no hover.
+
+🔹 Abordagem Algorítmica:
+Embora não haja um algoritmo iterativo, podemos considerar o "layout rendering" como um processo de complexidade O(1) em termos de espaço, pois o número de elementos é fixo.
+
+🔹 Tratamento de Erros:
+- Uso de `alt` nas imagens para acessibilidade e fallback caso a imagem não carregue.
+- Estrutura semântica para melhor compatibilidade com navegadores e leitores de tela.
+-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   
+    
+    <!-- Importando Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background-color: #f5f6fa; /* escolha uma cor de fundo clara */
+  color: #333;
+  padding: 20px;
+}
+
+.banner-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.banner {
+  background-color: #007BFF; /* azul vibrante */
+  color: #fff; /* texto branco para contraste */
+  text-align: center;
+  padding: 40px 20px;
+  border-radius: 10px; /* bordas arredondadas */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* sombra suave */
+  overflow: hidden;
+  width: 300px;
+  transition: transform 0.3s ease;
+}
+
+.banner:hover {
+  transform: scale(1.05);
+}
+
+    </style>
+</head>
+<body>
+<div class="banner-container">
+    <!-- Banner -->
+    <div class="banner">
+        <i class="fas fa-upload fa-2x"></i> <!-- Ícone -->
+        <h1>Upload Fácil</h1>
+        <p1>Suporte para PDF até 100MB</p1>
+          
+    </div>
+
+    <<div class="banner-container">
+    <!-- Banner -->
+    <div class="banner">
+        <i class="fa-solid fa-bolt fa-2x"></i> <!-- Ícone -->
+        <h1>Pagamentos Instantâneos</h1>
+        <p1>Pagar via Pix mandar confirmação automática</p1>          
+    </div>
+  <<div class="banner-container">
+    <!-- Banner -->
+    <div class="banner">
+        <i class="fas fa-shield-alt fa-2x"></i> <!-- Ícone -->
+        <h1>Seguro  + Confiável</h1>
+        <p1 >Seu Arquivo são protegidos e processados com segurança</p1>          
+    </div>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<title>Ícones com Material Icons</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+    }
+
+    .banner-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+    }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background-color: #f5f6fa; /* escolha uma cor e mantenha */
+  color: #333;
+  padding: 20px; /* se quiser manter */
+}
+
+.banner-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.banner {
+  background-color: #fff; /* ou #007BFF, mas escolha um */
+  color: rgb(15, 15, 15);
+  text-align: center;
+  padding: 40px 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+  width: 300px;
+  transition: transform 0.3s ease;
+}
+
+.banner:hover {
+  transform: scale(1.05);
+}
+
+        
+</style>
+</head>
+<body>
+ 
+    <div class></div>>
+            
+        </div>
+    </div>
+</div>
+
+</body>
+
+
+  
 
   <!-- Barra de etapas -->
   <div class="stepper">
