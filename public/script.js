@@ -311,63 +311,59 @@ document.getElementById("finalizar").addEventListener("click", async () => {
   goToStep(5);
   const codigo = gerarCodigoImpressao();
   document.getElementById("codigo-gerado").innerText = codigo;
-  
-  // Salva no histórico
+
   try {
-    // Validar campos obrigatórios
-    if (!fileInput.files || !fileInput.files[0]) {
-      throw new Error('Arquivo não encontrado');
-    }
+    const file = fileInput.files[0];
+    if (!file) throw new Error("Arquivo não encontrado");
 
-    if (!valorImpressao || !copiasInput.value || !corSelect.value || !tamanhoSelect.value) {
-      throw new Error('Configurações de impressão incompletas');
-    }
+    // FormData — envia arquivo + dados
+    const formData = new FormData();
+    formData.append("file", file); // PDF/DOCX real
 
-    // Preparar dados
-    const dadosHistorico = {
-      codigo: codigo,
-      datetime: new Date().toISOString(),
-      documento: fileInput.files[0].name,
-      valor: Number(valorImpressao.toFixed(2)),
-      configuracoes: {
-        copias: Number(copiasInput.value),
-        cor: corSelect.value,
-        tamanho: tamanhoSelect.value,
-        paginas: Number(detectedPages),
-        frenteVerso: Boolean(frenteVersoCheck.checked),
-        orientacao: document.getElementById('orientacao')?.value || 'retrato'
-      }
-    };
+    formData.append("codigo", codigo);
+    formData.append("datetime", new Date().toISOString());
+    formData.append("valor", valorImpressao.toFixed(2));
 
-    console.log('Enviando para histórico:', dadosHistorico);
+    formData.append("copias", copiasInput.value);
+    formData.append("cor", corSelect.value);
+    formData.append("tamanho", tamanhoSelect.value);
+    formData.append("paginas", detectedPages);
+    formData.append("frenteVerso", frenteVersoCheck.checked);
+    formData.append("orientacao", document.getElementById("orientacao").value);
 
-    // Enviar requisição
-    const response = await fetch('/api/historic', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(dadosHistorico)
-    });
+    const response = await fetch("/api/historic", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+          codigo,
+          datetime: new Date().toISOString(),
+          valor: valorImpressao,
+          configuracoes: {
+              copias: copiasInput.value,
+              cor: corSelect.value,
+              tamanho: tamanhoSelect.value,
+              paginas: detectedPages,
+              frenteVerso: frenteVersoCheck.checked,
+              orientacao: orientacao.value
+          }
+      })
+  });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || 'Erro ao salvar no histórico');
-    }
+    console.log("Arquivo e dados salvos:", result);
 
-    const result = await response.json();
-    console.log('Resposta do servidor:', result);
-
-    // Verificar se os dados foram salvos corretamente
-    if (!result.entry || !result.entry.id) {
-      throw new Error('Resposta do servidor incompleta');
-    }
   } catch (err) {
-    console.error('Erro ao salvar no histórico:', err);
-    alert('Erro ao salvar no histórico: ' + err.message);
+    console.error("Erro finalização:", err);
+    alert("Erro ao registrar pedido: " + err.message);
   }
 });
+
+    const response = await fetch("/api/historic/upload", {
+      method: "POST",
+      body: formData
+    });
+
+    const result = await response.json();  // <-- necessário
+    if (!response.ok) throw new Error(result.error || "Erro ao salvar");
 
 // ----------------------
 // ETAPA 5: Reiniciar
@@ -387,6 +383,10 @@ document.getElementById("novo-pedido").addEventListener("click", () => {
   detectedPages = 1;
   setNext1Enabled();
 });
+
+console.log("RECEBIDO NO BACKEND:", req.body);
+console.log('Dados recebidos:', req.body);
+
 
 // ----------------------
 // Função: Código de Impressão

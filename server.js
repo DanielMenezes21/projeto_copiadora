@@ -15,19 +15,18 @@ if (!fs.existsSync(UPLOAD_DIR)) {
 }
 
 // Configurar multer para upload de arquivos
-const upload = multer({ 
-  dest: UPLOAD_DIR,
-  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
-  fileFilter: (req, file, cb) => {
-    // Aceita apenas PDF por enquanto
-    if (file.mimetype === 'application/pdf') {
-      cb(null, true);
-    } else {
-      cb(null, false);
-      cb(new Error('Apenas arquivos PDF são aceitos'));
-    }
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, UPLOAD_DIR);
+  },
+  filename: (req, file, cb) => {
+    // Mantém o nome ORIGINAL
+    const originalName = file.originalname;
+    cb(null, originalName);
   }
 });
+
+const upload = multer({ storage });
 
 // Inicializar Express
 const app = express();
@@ -106,7 +105,14 @@ app.post("/api/historic", (req, res) => {
     }
 
     // Ler dados existentes
-    const data = JSON.parse(fs.readFileSync(HISTORIC_PATH, "utf-8"));
+    let data = [];
+    try {
+      const raw = fs.readFileSync(HISTORIC_PATH, "utf-8").trim();
+      data = raw ? JSON.parse(raw) : [];
+    } catch (err) {
+      console.warn("historic.json estava corrompido ou vazio. Recriando arquivo...");
+      data = [];
+    }
     const nextId = data.length > 0 ? Math.max(...data.map(d => d.id)) + 1 : 1;
 
     // Criar entrada garantindo todos os campos
@@ -154,7 +160,7 @@ app.post('/api/parse-pages', upload.single('file'), async (req, res) => {
     const pages = data.numpages || data.numPages || (data.pages ? data.pages.length : null);
 
     // remove arquivo temporário
-    try { fs.unlinkSync(req.file.path); } catch (e) {}
+    // try { fs.unlinkSync(req.file.path); } catch (e) {}
 
     return res.json({ pages: pages || 0 });
   } catch (err) {
@@ -167,6 +173,11 @@ app.post('/api/parse-pages', upload.single('file'), async (req, res) => {
 // --- Rota da página de administração ---
 app.get("/admin", (req, res) => {
   res.sendFile(path.join(__dirname, "private", "admin.html"));
+});
+
+// --- Rota da página de impressão ---
+app.get("/print", (req, res) => {
+  res.sendFile(path.join(__dirname, "page_print", "print_page.html"));
 });
 
 // --- Inicialização do servidor ---

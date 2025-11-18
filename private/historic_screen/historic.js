@@ -62,7 +62,15 @@ async function loadHistoric() {
       
       // Documento
       const tdDoc = document.createElement('td');
-      tdDoc.textContent = item.documento || '(Sem nome)';
+      if (item.arquivoPath) {
+        tdDoc.innerHTML = `<a href="${item.arquivoPath}" 
+                              target="_blank"
+                              style="color: #007bff; text-decoration: none;">
+                              ${item.documento}
+                          </a>`;
+      } else {
+        tdDoc.textContent = item.documento || '(Sem nome)';
+      }
       
       // Valor
       const tdValor = document.createElement('td');
