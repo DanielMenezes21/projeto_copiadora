@@ -42,6 +42,29 @@ async function selecionarImpressoraPorPedido(pedido) {
 }
 
 // =========================
+// FUNÇÃO: Enviar para impressora
+// =========================
+async function enviarParaImpressora(impressoraId, documento, copias) {
+    const res = await fetch(`${API_SERVER}/api/print`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            impressoraId: impressoraId,
+            documento: documento,
+            copias: copias
+        })
+    });
+
+    if (!res.ok) {
+        const erro = await res.json();
+        throw new Error(erro.error || "Erro ao enviar para impressora");
+    }
+
+    const dados = await res.json();
+    return dados;
+}
+
+// =========================
 // FUNÇÃO: Processar impressão
 // =========================
 async function processarImpressao() {
@@ -81,6 +104,16 @@ Configurações do Pedido:
 `;
 
         alert("✅ Pedido selecionado para impressão!\n" + detalhes);
+
+        // Enviar para impressora
+        console.log("📤 Enviando para impressora...");
+        const resultadoImpressao = await enviarParaImpressora(
+            impressora.id,
+            pedido.documento,
+            pedido.configuracoes.copias
+        );
+
+        alert("✅ " + resultadoImpressao.mensagem);
 
         // Limpar campo e manter foco
         codigoInput.value = "";

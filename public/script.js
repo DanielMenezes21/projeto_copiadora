@@ -69,17 +69,33 @@ function validarArquivo(file) {
   const nomeArquivo = file.name.toLowerCase();
   const valido = extensoesPermitidas.some(ext => nomeArquivo.endsWith(ext));
 
+  console.log("📁 Arquivo selecionado:", file.name, "- Válido:", valido);
+
   if (valido) {
     uploadText.innerHTML = `<strong>Arquivo selecionado:</strong><br><span class="file-name">${file.name}</span>`;
-    // show selected file info and pages placeholder
-    if (arquivoSelecionadoEl) arquivoSelecionadoEl.innerHTML = `Arquivo: <strong>${file.name}</strong> — Páginas: <span id="page-count">determinando...</span>`;
-  // enable next only if checkbox is checked too
-  setNext1Enabled();
-    // tenta detectar número de páginas automaticamente (PDF)
-    if (typeof detectPages === 'function') detectPages(file);
+    
+    if (arquivoSelecionadoEl) {
+      arquivoSelecionadoEl.innerHTML = `Arquivo: <strong>${file.name}</strong> — Páginas: <span id="page-count">determinando...</span>`;
+    }
+    
+    setNext1Enabled();
+    
+    // Detecta número de páginas (apenas para PDF)
+    if (nomeArquivo.endsWith(".pdf")) {
+      console.log("📄 Detectando páginas do PDF...");
+      detectPages(file);
+    } else {
+      // Para Word, assume 1 página como padrão
+      console.log("📝 Arquivo Word - usando 1 página como padrão");
+      detectedPages = 1;
+      const pageCountEl = document.getElementById('page-count');
+      if (pageCountEl) pageCountEl.textContent = '1 (estimado)';
+      atualizarValor();
+    }
   } else {
-    uploadText.innerHTML = `<span style="color: red; font-weight: bold;">Arquivo inválido!</span><br>
-      <small>Apenas PDF ou Word são aceitos.</small>`;
+    uploadText.innerHTML = `<span style="color: red; font-weight: bold;">❌ Arquivo inválido!</span><br>
+      <small>Apenas PDF ou Word (.doc, .docx) são aceitos.</small>`;
+    detectedPages = 1;
     setNext1Enabled();
   }
 }
@@ -87,31 +103,48 @@ function validarArquivo(file) {
 // Detecta número de páginas via endpoint server-side
 async function detectPages(file) {
   const pageCountEl = document.getElementById('page-count');
-  if (pageCountEl) pageCountEl.textContent = 'determinando...';
+  
+  if (pageCountEl) pageCountEl.textContent = '⏳ detectando...';
 
   try {
     const form = new FormData();
     form.append('file', file);
-    const res = await fetch('/api/parse-pages', { method: 'POST', body: form });
+    
+    console.log("📤 Enviando arquivo para análise...");
+    const res = await fetch('/api/parse-pages', { 
+      method: 'POST', 
+      body: form 
+    });
+    
     if (res.ok) {
       const data = await res.json();
+      console.log("✅ Resposta recebida:", data);
+      
       if (data.pages && data.pages > 0) {
         detectedPages = parseInt(data.pages, 10) || 1;
+        console.log("📖 Páginas detectadas:", detectedPages);
         if (pageCountEl) pageCountEl.textContent = detectedPages;
         atualizarValor();
       } else {
+        console.warn("⚠️ Número de páginas indeterminado, usando padrão");
         detectedPages = 1;
-        if (pageCountEl) pageCountEl.textContent = detectedPages;
+        if (pageCountEl) pageCountEl.textContent = '1 (padrão)';
+        atualizarValor();
       }
     } else {
+      console.error("❌ Erro na resposta do servidor:", res.status);
       const err = await res.json().catch(() => ({}));
-      console.log('parse-pages error', err);
-      if (pageCountEl) pageCountEl.textContent = 'n/a';
+      console.error("Detalhes do erro:", err);
+      
+      detectedPages = 1;
+      if (pageCountEl) pageCountEl.textContent = '1 (padrão)';
+      atualizarValor();
     }
   } catch (e) {
-    console.error('Erro detectPages:', e);
-    if (pageCountEl) pageCountEl.textContent = 'erro';
+    console.error('❌ Erro ao detectar páginas:', e);
     detectedPages = 1;
+    if (pageCountEl) pageCountEl.textContent = '1 (erro)';
+    atualizarValor();
   }
 }
 
@@ -151,17 +184,21 @@ async function carregarConfig() {
 
 // Cálculo do valor
 function atualizarValor() {
-  if (!configValores) return;
+  if (!configValores) {
+    console.warn("⚠️ Configurações não carregadas ainda");
+    return;
+  }
 
   const copias = parseInt(copiasInput.value) || 1;
   const cor = corSelect.value;
-  const tamanho = document.getElementById("tamanho").value;
+  const tamanho = tamanhoSelect.value;
   const paginas = detectedPages || 1;
   const frenteVerso = frenteVersoCheck.checked;
-  const tamanhoSelect = document.getElementById("tamanho");
-  const orientacao = document.getElementById('orientacao') ? document.getElementById('orientacao').value : 'retrato';
+  const orientacao = document.getElementById('orientacao').value || 'retrato';
 
-  // Escolher o campo correto conforme o tamanho e cor
+  console.log("💰 Calculando valor:", { copias, cor, tamanho, paginas, frenteVerso, orientacao });
+
+  // Escolher o preço conforme tamanho e cor
   let precoBase = 0;
   if (tamanho === "a4") {
     precoBase = cor === "preto-branco" ? configValores.a4PretoBranco : configValores.a4Colorido;
@@ -169,46 +206,45 @@ function atualizarValor() {
     precoBase = cor === "preto-branco" ? configValores.a3PretoBranco : configValores.a3Colorido;
   }
 
-  // Frente e verso pode custar um pouco menos
+  // Frente e verso oferece desconto de 5%
   if (frenteVerso) precoBase *= 0.95;
 
-  // Calcula o total (considerando número de páginas por cópia)
-  const unitPrice = precoBase; // preço por folha já com ajuste frente/verso
+  // Calcula total
+  const unitPrice = precoBase;
   const pricePerCopy = unitPrice * paginas;
   valorImpressao = pricePerCopy * copias;
 
-  // Cria ou atualiza o elemento de exibição
+  console.log("💵 Valor calculado: R$", valorImpressao.toFixed(2));
+
+  // Atualiza elemento de valor na etapa 2
   let totalEl = document.getElementById("valor-impressao");
   if (!totalEl) {
     totalEl = document.createElement("p");
     totalEl.id = "valor-impressao";
-    totalEl.style.textAlign = "center";
-    totalEl.style.color = "#007bff";
-    totalEl.style.fontWeight = "bold";
-    document.getElementById("print-config").appendChild(totalEl);
+    totalEl.className = "valor-box";
+    const printConfig = document.getElementById("print-config");
+    if (printConfig) printConfig.appendChild(totalEl);
   }
-
   totalEl.textContent = `Valor total: R$ ${valorImpressao.toFixed(2)}`;
 
-  // Atualiza resumo (se a tela de confirmação estiver visível)
+  // Atualiza resumo na etapa 3
   const resumoValorEl = document.getElementById("resumo-valor");
   const resumoCopiasEl = document.getElementById("resumo-copias");
   const resumoCorEl = document.getElementById("resumo-cor");
   const resumoTamanhoEl = document.getElementById("resumo-tamanho");
   const resumoFrenteEl = document.getElementById("resumo-frente");
-  if (resumoValorEl) resumoValorEl.textContent = `R$ ${valorImpressao.toFixed(2)}`;
-  if (resumoCopiasEl) resumoCopiasEl.textContent = copias;
-  if (resumoCorEl) resumoCorEl.textContent = cor === 'colorido' ? 'Colorido' : 'Preto e Branco';
-  if (resumoTamanhoEl) resumoTamanhoEl.textContent = tamanho.toUpperCase();
-  if (resumoFrenteEl) resumoFrenteEl.textContent = frenteVerso ? 'Sim' : 'Não';
-  // pages shown with the uploaded file; no manual pages input
   const resumoArquivoEl = document.getElementById('resumo-arquivo');
   const resumoPaginasEl = document.getElementById('resumo-paginas');
   const resumoOrientacaoEl = document.getElementById('resumo-orientacao');
   const resumoUnitarioEl = document.getElementById('resumo-valor-unitario');
   const resumoPorCopiaEl = document.getElementById('resumo-valor-por-copia');
+
+  if (resumoValorEl) resumoValorEl.textContent = `R$ ${valorImpressao.toFixed(2)}`;
+  if (resumoCopiasEl) resumoCopiasEl.textContent = copias;
+  if (resumoCorEl) resumoCorEl.textContent = cor === 'colorido' ? 'Colorido' : 'Preto e Branco';
+  if (resumoTamanhoEl) resumoTamanhoEl.textContent = tamanho.toUpperCase();
+  if (resumoFrenteEl) resumoFrenteEl.textContent = frenteVerso ? 'Sim' : 'Não';
   if (resumoArquivoEl) {
-    // show file name if available
     const fi = fileInput.files && fileInput.files[0];
     resumoArquivoEl.textContent = fi ? fi.name : '-';
   }
@@ -216,7 +252,6 @@ function atualizarValor() {
   if (resumoOrientacaoEl) resumoOrientacaoEl.textContent = orientacao === 'paisagem' ? 'Paisagem' : 'Retrato';
   if (resumoUnitarioEl) resumoUnitarioEl.textContent = `R$ ${unitPrice.toFixed(2)}`;
   if (resumoPorCopiaEl) resumoPorCopiaEl.textContent = `R$ ${pricePerCopy.toFixed(2)}`;
-  // pages shown with the uploaded file; no manual pages input
 }
 
 // Eventos para recalcular
@@ -316,54 +351,39 @@ document.getElementById("finalizar").addEventListener("click", async () => {
     const file = fileInput.files[0];
     if (!file) throw new Error("Arquivo não encontrado");
 
-    // FormData — envia arquivo + dados
-    const formData = new FormData();
-    formData.append("file", file); // PDF/DOCX real
-
-    formData.append("codigo", codigo);
-    formData.append("datetime", new Date().toISOString());
-    formData.append("valor", valorImpressao.toFixed(2));
-
-    formData.append("copias", copiasInput.value);
-    formData.append("cor", corSelect.value);
-    formData.append("tamanho", tamanhoSelect.value);
-    formData.append("paginas", detectedPages);
-    formData.append("frenteVerso", frenteVersoCheck.checked);
-    formData.append("orientacao", document.getElementById("orientacao").value);
-
+    // Enviar dados do pedido via JSON
     const response = await fetch("/api/historic", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-          codigo,
-          datetime: new Date().toISOString(),
-          valor: valorImpressao,
-          configuracoes: {
-              copias: copiasInput.value,
-              cor: corSelect.value,
-              tamanho: tamanhoSelect.value,
-              paginas: detectedPages,
-              frenteVerso: frenteVersoCheck.checked,
-              orientacao: orientacao.value
-          }
+        codigo,
+        datetime: new Date().toISOString(),
+          documento: file.name,
+        valor: valorImpressao,
+        configuracoes: {
+          copias: parseInt(copiasInput.value) || 1,
+          cor: corSelect.value,
+          tamanho: tamanhoSelect.value,
+          paginas: detectedPages,
+          frenteVerso: frenteVersoCheck.checked,
+          orientacao: document.getElementById("orientacao").value || 'retrato'
+        }
       })
-  });
+    });
 
-    console.log("Arquivo e dados salvos:", result);
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || "Erro ao salvar pedido");
+    }
+
+    const result = await response.json();
+    console.log("✅ Pedido registrado:", result);
 
   } catch (err) {
-    console.error("Erro finalização:", err);
+    console.error("❌ Erro ao finalizar:", err);
     alert("Erro ao registrar pedido: " + err.message);
   }
 });
-
-    const response = await fetch("/api/historic/upload", {
-      method: "POST",
-      body: formData
-    });
-
-    const result = await response.json();  // <-- necessário
-    if (!response.ok) throw new Error(result.error || "Erro ao salvar");
 
 // ----------------------
 // ETAPA 5: Reiniciar
@@ -375,18 +395,16 @@ document.getElementById("novo-pedido").addEventListener("click", () => {
   uploadText.innerHTML = `Arraste seu arquivo aqui ou <span class="select-file">clique para selecionar</span><br>
     <small>(Apenas PDF ou Word)</small>`;
   next1.disabled = true;
-  // reset termo checkbox and file info
+  
   if (termoCheckbox) termoCheckbox.checked = false;
   if (arquivoSelecionadoEl) arquivoSelecionadoEl.innerHTML = '';
+  
   const pageCountEl = document.getElementById('page-count');
   if (pageCountEl) pageCountEl.textContent = '';
+  
   detectedPages = 1;
   setNext1Enabled();
 });
-
-console.log("RECEBIDO NO BACKEND:", req.body);
-console.log('Dados recebidos:', req.body);
-
 
 // ----------------------
 // Função: Código de Impressão

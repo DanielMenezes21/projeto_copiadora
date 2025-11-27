@@ -1,61 +1,25 @@
 {
   "impressoras": [
     {
-      "id": 1,
-      "nome": "Xerox WorkCentre 5335",
-      "modelo": "Xerox WorkCentre 5335",
+      "id": 4,
+      "nome": "RICOH aficio MP 5002",
+      "modelo": "RICOH",
       "tipo": "multifuncional",
-      "ip": "192.168.1.10",
+      "ip": "192.168.10.132",
       "puerto": 9100,
       "ativa": true,
       "capacidades": {
         "colorido": true,
         "preto_branco": true,
-        "tamanhos": ["a3", "a4"],
+        "tamanhos": [
+          "a4"
+        ],
         "duplex": true,
         "velocidade_ppm": 35
       },
       "status": "online",
-      "toner_level": 85,
-      "papel_restante": 90
-    },
-    {
-      "id": 2,
-      "nome": "HP LaserJet Pro",
-      "modelo": "HP LaserJet Pro M404n",
-      "tipo": "impressora_laser",
-      "ip": "192.168.1.11",
-      "puerto": 9100,
-      "ativa": true,
-      "capacidades": {
-        "colorido": false,
-        "preto_branco": true,
-        "tamanhos": ["a4"],
-        "duplex": true,
-        "velocidade_ppm": 40
-      },
-      "status": "online",
-      "toner_level": 60,
-      "papel_restante": 75
-    },
-    {
-      "id": 3,
-      "nome": "Canon imagePRESS",
-      "modelo": "Canon imagePRESS C256",
-      "tipo": "impressora_producao",
-      "ip": "192.168.1.12",
-      "puerto": 9100,
-      "ativa": true,
-      "capacidades": {
-        "colorido": true,
-        "preto_branco": true,
-        "tamanhos": ["a3", "a4"],
-        "duplex": true,
-        "velocidade_ppm": 60
-      },
-      "status": "online",
-      "toner_level": 75,
-      "papel_restante": 85
+      "toner_level": 100,
+      "papel_restante": 100
     }
   ]
 }

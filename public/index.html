@@ -2,12 +2,16 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Projeto Copiadora</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projeto Copiadora - Impressão Rápida</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Font Awesome para ícones -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
- </head>
+</head>
+
 <body>
+  <!-- ========================================
+       HEADER E NAVEGAÇÃO
+       ======================================== -->
   <header>
     <div class="logo">
       <img src="image/logo_copiadora2.png" alt="Logo da Copiadora" />
@@ -17,206 +21,52 @@
       <button class="nav-btn"><i class="fa-solid fa-circle-info"></i> Sobre</button>
       <button class="nav-btn"><i class="fa-solid fa-headset"></i> Suporte</button>
     </nav>
-    
   </header>
-  
-    <section class="hero-image">
-    <img src="image/logo1_copiadora.png" alt="Arte principal" />
+
+  <!-- ========================================
+       SEÇÃO HERÓI (IMAGEM PRINCIPAL)
+       ======================================== -->
+  <section class="hero-image">
+    <img src="image/logo1_copiadora.png" alt="Arte principal do sistema" />
   </section>
-  
+
+  <!-- ========================================
+       INTRODUÇÃO
+       ======================================== -->
   <main>
     <h1>Bem-vindo ao Sistema de Autoatendimento de Impressão</h1>
-    <h2> 
-      Sua Gráfica Rápida na Palma da Mão 
-    </h2>
+    <h2>Sua Gráfica Rápida na Palma da Mão</h2>
     <p>
-      Envie seu arquivo, pague via pix e imprima em instantes. Simples, rápido e sem complicações
+      Envie seu arquivo, pague via PIX e imprima em instantes. Simples, rápido e sem complicações.
     </p>
   </main>
 
-<head>
-            
-<body>
-   
-</body>
-
- <!-- espaçamento entre a linha e os banners -->
- <!--
-📜 Explicação Detalhada do Código
-
-Este código cria 3 caixas (banners) para anúncios usando HTML e CSS, com layout responsivo e efeitos visuais.
-
-🔹 Estrutura HTML:
-- `<div class="banner-container">`: Contêiner flexível que organiza os banners lado a lado.
-- `<div class="banner">`: Cada banner individual, contendo:
-  
-  - `<div class="banner-content">`: Texto e botão de ação.
-
-🔹 Estilo CSS:
-- Uso de **Flexbox** para alinhamento responsivo.
-- **Sombras e bordas arredondadas** para estética moderna.
-- **Transição e transformação** para efeito de zoom ao passar o mouse.
-- **Botões estilizados** com mudança de cor no hover.
-
-🔹 Abordagem Algorítmica:
-Embora não haja um algoritmo iterativo, podemos considerar o "layout rendering" como um processo de complexidade O(1) em termos de espaço, pois o número de elementos é fixo.
-
-🔹 Tratamento de Erros:
-- Uso de `alt` nas imagens para acessibilidade e fallback caso a imagem não carregue.
-- Estrutura semântica para melhor compatibilidade com navegadores e leitores de tela.
--->
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   
-    
-    <!-- Importando Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <style>
-        * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: "Segoe UI", Arial, sans-serif;
-  background-color: #f5f6fa; /* escolha uma cor de fundo clara */
-  color: #333;
-  padding: 20px;
-}
-
-.banner-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-}
-
-.banner {
-  background-color: #007BFF; /* azul vibrante */
-  color: #fff; /* texto branco para contraste */
-  text-align: center;
-  padding: 40px 20px;
-  border-radius: 10px; /* bordas arredondadas */
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* sombra suave */
-  overflow: hidden;
-  width: 300px;
-  transition: transform 0.3s ease;
-}
-
-.banner:hover {
-  transform: scale(1.05);
-}
-
-    </style>
-</head>
-<body>
-<div class="banner-container">
-    <!-- Banner -->
+  <!-- ========================================
+       BANNERS DE DESTAQUES
+       ======================================== -->
+  <section class="banner-container">
     <div class="banner">
-        <i class="fas fa-upload fa-2x"></i> <!-- Ícone -->
-        <h1>Upload Fácil</h1>
-        <p1>Suporte para PDF até 100MB</p1>
-          
+      <i class="fas fa-upload fa-2x"></i>
+      <h3>Upload Fácil</h3>
+      <p>Suporte para PDF até 100MB</p>
     </div>
 
-    <<div class="banner-container">
-    <!-- Banner -->
     <div class="banner">
-        <i class="fa-solid fa-bolt fa-2x"></i> <!-- Ícone -->
-        <h1>Pagamentos Instantâneos</h1>
-        <p1>Pagar via Pix mandar confirmação automática</p1>          
+      <i class="fa-solid fa-bolt fa-2x"></i>
+      <h3>Pagamentos Instantâneos</h3>
+      <p>Pague via PIX com confirmação automática</p>
     </div>
-  <<div class="banner-container">
-    <!-- Banner -->
+
     <div class="banner">
-        <i class="fas fa-shield-alt fa-2x"></i> <!-- Ícone -->
-        <h1>Seguro  + Confiável</h1>
-        <p1 >Seu Arquivo são protegidos e processados com segurança</p1>          
+      <i class="fas fa-shield-alt fa-2x"></i>
+      <h3>Seguro + Confiável</h3>
+      <p>Seus arquivos são protegidos e processados com segurança</p>
     </div>
-</body>
-</html>
+  </section>
 
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-<title>Ícones com Material Icons</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        margin: 0;
-        padding: 20px;
-    }
-
-    .banner-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        justify-content: center;
-    }
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: "Segoe UI", Arial, sans-serif;
-  background-color: #f5f6fa; /* escolha uma cor e mantenha */
-  color: #333;
-  padding: 20px; /* se quiser manter */
-}
-
-.banner-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-}
-
-.banner {
-  background-color: #fff; /* ou #007BFF, mas escolha um */
-  color: rgb(15, 15, 15);
-  text-align: center;
-  padding: 40px 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  overflow: hidden;
-  width: 300px;
-  transition: transform 0.3s ease;
-}
-
-.banner:hover {
-  transform: scale(1.05);
-}
-
-        
-</style>
-</head>
-<body>
- 
-    <div class></div>>
-            
-        </div>
-    </div>
-</div>
-
-</body>
-
-
-  
-
-  <!-- Barra de etapas -->
+  <!-- ========================================
+       STEPPER (ETAPAS)
+       ======================================== -->
   <div class="stepper">
     <div class="step active" data-step="1">1</div>
     <div class="step" data-step="2">2</div>
@@ -225,8 +75,11 @@ body {
     <div class="step" data-step="5">5</div>
   </div>
 
-  <main>
-    <!-- Etapa 1: Upload -->
+  <!-- ========================================
+       CONTEÚDO DAS ETAPAS
+       ======================================== -->
+  <main class="steps-main">
+    <!-- ETAPA 1: UPLOAD -->
     <section class="step-content active" id="step-1">
       <h1>Upload do Arquivo</h1>
       <div class="upload-box" id="upload-box">
@@ -237,19 +90,25 @@ body {
         </p>
         <input type="file" id="file-input" hidden accept=".pdf,.doc,.docx">
       </div>
-      <div style="margin-top:12px; text-align:left;">
-        <label style="cursor:pointer"><input type="checkbox" id="aceito-termo">&nbsp;Eu li e aceito o Termo de Responsabilidade</label>
-        &nbsp;<a href="#" id="abrir-termo" style="font-size:0.9em">(ver termo)</a>
+
+      <div class="termo-section">
+        <label style="cursor:pointer">
+          <input type="checkbox" id="aceito-termo">
+          Eu li e aceito o Termo de Responsabilidade
+        </label>
+        <a href="#" id="abrir-termo" style="font-size:0.9em">(ver termo)</a>
       </div>
+
       <div class="step-buttons">
         <button type="button" id="next-1" class="next-btn" disabled>Próxima Etapa</button>
       </div>
     </section>
 
-    <!-- Etapa 2: Configuração -->
+    <!-- ETAPA 2: CONFIGURAÇÕES -->
     <section class="step-content" id="step-2">
       <h1>Configurações de Impressão</h1>
       <p id="arquivo-selecionado" class="arquivo-selecionado"></p>
+
       <form id="print-config" class="config-grid">
         <div class="config-item">
           <i class="config-icon fa-solid fa-copy"></i>
@@ -304,11 +163,12 @@ body {
       </form>
     </section>
 
-    <!-- Etapa 3: Confirmação (revise as informações de impressão) -->
+    <!-- ETAPA 3: CONFIRMAÇÃO -->
     <section class="step-content" id="step-3">
       <h1>Confirmação</h1>
       <p>Revise suas informações antes de prosseguir para o pagamento.</p>
-      <div id="resumo-impressao">
+
+      <div id="resumo-impressao" class="resumo-box">
         <p><strong>Arquivo:</strong> <span id="resumo-arquivo">-</span></p>
         <p><strong>Páginas:</strong> <span id="resumo-paginas">-</span></p>
         <p><strong>Cópias:</strong> <span id="resumo-copias">1</span></p>
@@ -321,94 +181,108 @@ body {
         <p><strong>Valor por cópia (todas as páginas):</strong> <span id="resumo-valor-por-copia">R$ 0.00</span></p>
         <p><strong>Valor estimado (total):</strong> <span id="resumo-valor">R$ 0.00</span></p>
       </div>
+
       <div class="step-buttons">
-        <button type="button" id="back-3" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
-        <button type="button" id="next-3" class="next-btn">Ir para Pagamento</button>
+        <button type="button" id="back-3" class="back-btn">
+          <i class="fa-solid fa-arrow-left"></i> Voltar
+        </button>
+        <button type="button" id="next-3" class="next-btn">
+          Ir para Pagamento
+        </button>
       </div>
     </section>
 
-      <!-- (termo link moved to step 1) -->
-
-      <!-- Modal -->
-      <div id="modal-termo" class="modal">
-        <div class="modal-content">
-          <span class="close">&times;</span>
-          <h2>Termo de Responsabilidade e Compromisso</h2>
-
-          <h3>1. RESPONSABILIDADE DO CLIENTE</h3>
-          <p>
-            O cliente é totalmente responsável pelo conteúdo, qualidade e correção dos arquivos enviados para impressão. 
-            Isso inclui, mas não se limita a: texto, imagens, formatação, margens, cores e qualquer outro elemento presente no documento.
-          </p>
-
-          <h3>2. LIMITAÇÃO DE RESPONSABILIDADE</h3>
-          <p>
-            A Rei das Impressões NÃO se responsabiliza por:
-            <ul>
-              <li>Arquivos enviados com erro de conteúdo, formatação ou layout</li>
-              <li>Documentos com texto cortado, desalinhado ou com formatação inadequada</li>
-              <li>Cores que não correspondam ao esperado devido às configurações do arquivo original</li>
-              <li>Qualidade de imagens de baixa resolução presentes no arquivo</li>
-              <li>Erros ortográficos, gramaticais ou de informação contidos no documento</li>
-              <li>Margens inadequadas que resultem em corte de conteúdo</li>
-            </ul>
-          </p>
-
-          <h3>3. RECOMENDAÇÕES IMPORTANTES</h3>
-          <p>
-            Para garantir a melhor qualidade de impressão, recomendamos:
-            <ul>
-              <li>Verificar cuidadosamente o arquivo antes do envio</li>
-              <li>Utilizar margens de pelo menos 1cm em todos os lados</li>
-              <li>Certificar-se de que todas as informações estão corretas</li>
-              <li>Escolher as configurações de impressão adequadas (cor, frente/verso, etc.)</li>
-            </ul>
-          </p>
-
-          <h3>4. POLÍTICA DE REIMPRESSÃO</h3>
-          <p>
-            Reimpressões por erro do cliente (arquivo incorreto, formatação inadequada, etc.) serão cobradas integralmente. 
-            Reimpressões por falha técnica de nossa parte serão realizadas sem custo adicional.
-          </p>
-
-          <h3>5. PAGAMENTO E PROCESSAMENTO</h3>
-          <p>
-            Após a confirmação do pagamento via PIX, o pedido será processado e impresso conforme as especificações selecionadas. 
-            O pedido não poderá ser cancelado ou modificado após a confirmação do pagamento.
-          </p>
-
-          <h3>6. PRAZO DE RETIRADA</h3>
-          <p>
-            O cliente tem até 30 dias para retirar o pedido impresso. Após este prazo, os documentos poderão ser descartados e não haverá reembolso.
-          </p>
-
-          <button id="aceitar-termo" class="next-btn">Aceito</button>
-        </div>
-      </div>
-
-    <!-- Etapa 4: Pagamento -->
+    <!-- ETAPA 4: PAGAMENTO -->
     <section class="step-content" id="step-4">
       <h1>Pagamento</h1>
       <p>Escaneie o QR Code abaixo para realizar o pagamento:</p>
 
-      <div id="qrcode"></div>
-      <p id="qrcode-link" class="qrcode-link"></p> <!-- Texto com link/código -->
+      <div id="qrcode" class="qrcode-container"></div>
+      <p id="qrcode-link" class="qrcode-link"></p>
 
       <div class="step-buttons">
-        <button type="button" id="back-4" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
-        <button type="button" id="finalizar" class="next-btn">Finalizar Pedido</button>
+        <button type="button" id="back-4" class="back-btn">
+          <i class="fa-solid fa-arrow-left"></i> Voltar
+        </button>
+        <button type="button" id="finalizar" class="next-btn">
+          Finalizar Pedido
+        </button>
       </div>
+    </section>
 
+    <!-- ETAPA 5: CÓDIGO DE IMPRESSÃO -->
+    <section class="step-content" id="step-5">
+      <h1>Código de Impressão</h1>
+      <p>Use o código abaixo para retirar sua impressão na copiadora:</p>
+      <div id="codigo-gerado" class="codigo-box"></div>
+      <button type="button" id="novo-pedido" class="next-btn">
+        Novo Pedido
+      </button>
     </section>
   </main>
+
+  <!-- ========================================
+       MODAL - TERMO DE RESPONSABILIDADE
+       ======================================== -->
+  <div id="modal-termo" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Termo de Responsabilidade e Compromisso</h2>
+
+      <h3>1. RESPONSABILIDADE DO CLIENTE</h3>
+      <p>
+        O cliente é totalmente responsável pelo conteúdo, qualidade e correção dos arquivos enviados para impressão.
+      </p>
+
+      <h3>2. LIMITAÇÃO DE RESPONSABILIDADE</h3>
+      <p>
+        A Rei das Impressões NÃO se responsabiliza por:
+        <ul>
+          <li>Arquivos enviados com erro de conteúdo, formatação ou layout</li>
+          <li>Documentos com texto cortado, desalinhado ou com formatação inadequada</li>
+          <li>Cores que não correspondam ao esperado devido às configurações do arquivo original</li>
+          <li>Qualidade de imagens de baixa resolução presentes no arquivo</li>
+          <li>Erros ortográficos, gramaticais ou de informação contidos no documento</li>
+          <li>Margens inadequadas que resultem em corte de conteúdo</li>
+        </ul>
+      </p>
+
+      <h3>3. RECOMENDAÇÕES IMPORTANTES</h3>
+      <p>
+        Para garantir a melhor qualidade de impressão, recomendamos:
+        <ul>
+          <li>Verificar cuidadosamente o arquivo antes do envio</li>
+          <li>Utilizar margens de pelo menos 1cm em todos os lados</li>
+          <li>Certificar-se de que todas as informações estão corretas</li>
+          <li>Escolher as configurações de impressão adequadas (cor, frente/verso, etc.)</li>
+        </ul>
+      </p>
+
+      <h3>4. POLÍTICA DE REIMPRESSÃO</h3>
+      <p>
+        Reimpressões por erro do cliente serão cobradas integralmente.
+        Reimpressões por falha técnica de nossa parte serão realizadas sem custo adicional.
+      </p>
+
+      <h3>5. PAGAMENTO E PROCESSAMENTO</h3>
+      <p>
+        Após a confirmação do pagamento via PIX, o pedido será processado e impresso conforme as especificações selecionadas.
+        O pedido não poderá ser cancelado ou modificado após a confirmação do pagamento.
+      </p>
+
+      <h3>6. PRAZO DE RETIRADA</h3>
+      <p>
+        O cliente tem até 30 dias para retirar o pedido impresso. Após este prazo, os documentos poderão ser descartados.
+      </p>
+
+      <button id="aceitar-termo" class="next-btn">Aceito</button>
+    </div>
+  </div>
+
+  <!-- ========================================
+       SCRIPTS
+       ======================================== -->
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
-    <!--- Etapa 5: código de impressão -->
-  <section class="step-content" id="step-5">
-    <h1>Código de Impressão</h1>
-    <p>Use o código abaixo para retirar sua impressão na copiadora:</p>
-    <div id="codigo-gerado" class="codigo-box"></div>
-    <button type="button" id="novo-pedido" class="next-btn">Novo Pedido</button>
-  </section>
   <script src="script.js"></script>
 </body>
 </html>

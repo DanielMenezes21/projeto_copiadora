@@ -4,6 +4,7 @@ const path = require("path");
 const multer = require('multer');
 const pdf = require('pdf-parse');
 const printerManager = require('./printer-manager');
+const printService = require('./print-service');
 
 // Definição de caminhos
 const CONFIG_PATH = path.join(__dirname, "config.json");
@@ -36,6 +37,8 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/private", express.static(path.join(__dirname, "private")));
+// Servir os arquivos estáticos da interface de impressão (CSS/JS)
+app.use("/page_print", express.static(path.join(__dirname, "page_print")));
 
 // --- Rota para obter valores de configuração ---
 app.get("/api/config", (req, res) => {
@@ -315,6 +318,80 @@ app.delete("/api/printers/:id", (req, res) => {
   } catch (err) {
     console.error("Erro ao remover impressora:", err);
     res.status(500).json({ error: "Erro ao remover impressora" });
+  }
+});
+
+// ============================================================================
+// ROTA DE IMPRESSÃO - Enviar documento para impressora
+// ============================================================================
+
+app.post("/api/print", async (req, res) => {
+  try {
+    const { impressoraId, documento, copias = 1 } = req.body;
+
+    // Validar entrada
+    if (!impressoraId || !documento) {
+      return res.status(400).json({ error: "ID da impressora e documento são obrigatórios" });
+    }
+
+    // Carregar configuração das impressoras
+    const config = printerManager.carregarConfiguracaoImpressoras();
+    if (!config) {
+      return res.status(500).json({ error: "Erro ao carregar configuração de impressoras" });
+    }
+
+    // Encontrar impressora
+    const impressora = config.impressoras.find(imp => imp.id === parseInt(impressoraId));
+    if (!impressora) {
+      return res.status(404).json({ error: "Impressora não encontrada" });
+    }
+
+    // Verificar se está ativa e online
+    if (!impressora.ativa) {
+      return res.status(400).json({ error: "Impressora desativada" });
+    }
+
+    if (impressora.status !== "online") {
+      return res.status(400).json({ error: "Impressora offline" });
+    }
+
+    // Construir caminho do arquivo
+    const caminhoArquivo = path.join(__dirname, "uploads", documento);
+
+    // Verificar se arquivo existe
+    if (!fs.existsSync(caminhoArquivo)) {
+      return res.status(404).json({ error: "Arquivo não encontrado: " + documento });
+    }
+
+    console.log(`\n📤 Enviando para impressão:`);
+    console.log(`   Impressora: ${impressora.nome} (${impressora.ip}:${impressora.puerto})`);
+    console.log(`   Arquivo: ${documento}`);
+    console.log(`   Cópias: ${copias}`);
+
+    // Enviar para impressora
+    const resultado = await printService.imprimirArquivo(
+      impressora.ip,
+      impressora.puerto,
+      caminhoArquivo,
+      copias
+    );
+
+    console.log(`✅ Impressão concluída!\n`);
+
+    res.json({
+      sucesso: true,
+      mensagem: resultado,
+      impressora: {
+        id: impressora.id,
+        nome: impressora.nome,
+        modelo: impressora.modelo,
+        ip: impressora.ip
+      }
+    });
+
+  } catch (err) {
+    console.error("❌ Erro ao imprimir:", err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
