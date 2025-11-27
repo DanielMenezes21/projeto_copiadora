@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Impressoras - Admin</title>
+    <link rel="stylesheet" href="/private/admin-style.css">
+    <link rel="stylesheet" href="/private/printer-admin/admin-printers.css">
+</head>
+<body>
+    <!-- Seção de Autenticação -->
+    <div id="authSection" class="auth-section">
+        <h2>🔐 Acesso Restrito</h2>
+        <p style="color: #666; margin-bottom: 30px;">Digite a senha para acessar o gerenciador</p>
+        
+        <div class="input-group">
+            <input 
+                type="password" 
+                id="senhaAdmin" 
+                placeholder="Senha"
+                autofocus
+            >
+        </div>
+        
+        <button onclick="autenticar()">Entrar</button>
+    </div>
+
+    <!-- Seção de Gerenciamento (oculta inicialmente) -->
+    <div id="printerSection" style="display: none;">
+        <button class="logout-btn" onclick="logout()">Sair</button>
+        
+        <div class="printers-container">
+            <h1>🖨️ Gerenciador de Impressoras</h1>
+            
+            <div id="mensagem" class="message"></div>
+            
+            <button class="add-printer-btn" onclick="abrirFormulario()">
+                ➕ Adicionar Nova Impressora
+            </button>
+
+            <div id="impressorasList" class="printers-grid">
+                <!-- Impressoras serão carregadas aqui -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Adicionar/Editar Impressora -->
+    <div id="printerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Adicionar Impressora</h2>
+                <button class="close-btn" onclick="fecharFormulario()">&times;</button>
+            </div>
+
+            <form id="printerForm" onsubmit="salvarImpressora(event)">
+                <div class="form-group form-grid full">
+                    <div class="form-group">
+                        <label for="nome">Nome da Impressora *</label>
+                        <input type="text" id="nome" required>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="modelo">Modelo *</label>
+                        <input type="text" id="modelo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ip">IP *</label>
+                        <input type="text" id="ip" placeholder="192.168.1.10" required>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="puerto">Porta</label>
+                        <input type="number" id="puerto" value="9100">
+                    </div>
+                    <div class="form-group">
+                        <label for="tipo">Tipo</label>
+                        <select id="tipo">
+                            <option value="multifuncional">Multifuncional</option>
+                            <option value="impressora_laser">Laser</option>
+                            <option value="impressora_jato">Jato de Tinta</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Capacidades:</label>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="colorido" checked> Colorido
+                        </label>
+                        <label>
+                            <input type="checkbox" id="pretoBranco" checked> Preto e Branco
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="tamanhos">Tamanhos (A3, A4)</label>
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" id="tamanhoA4" checked> A4
+                            </label>
+                            <label>
+                                <input type="checkbox" id="tamanhoA3"> A3
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="velocidade">Velocidade (PPM) *</label>
+                        <input type="number" id="velocidade" value="35" required>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="toner">Nível de Toner (%)</label>
+                        <input type="number" id="toner" min="0" max="100" value="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="papel">Papel Restante (%)</label>
+                        <input type="number" id="papel" min="0" max="100" value="100">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="ativa" checked> Ativa
+                    </label>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="fecharFormulario()">Cancelar</button>
+                    <button type="submit" class="btn-save">Salvar Impressora</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/private/printer-admin/admin-printers.js"></script>
+</body>
+</html>

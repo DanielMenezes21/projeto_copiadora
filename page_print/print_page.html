@@ -3,23 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/pageprint/print_page.css">
+    <link rel="stylesheet" href="print_page.css">
     <title>Página de Impressão</title>
 </head>
 <body>
     <div class="container">
-        <h1>Documento para Impressão</h1>
+        <h1>Sistema de Impressão</h1>
+        
+        <div class="input-section">
+            <label for="codigoImpressao">Código de Impressão:</label>
+            <input 
+                type="text" 
+                id="codigoImpressao" 
+                placeholder="Digite o código do pedido"
+                autofocus
+            />
+        </div>
+
         <div class="info-box">
             <strong>Informações gerais:</strong><br>
-            Aqui você pode inserir detalhes importantes do documento.
+            Sistema automático de seleção de impressora baseado no tipo de pedido.
         </div>
-        <div class="content">
-            <h3>Conteúdo do Documento</h3>
-            <p>Insira aqui o conteúdo que deseja imprimir. Essa área já está estilizada para parecer um relatório.</p>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vehicula feugiat metus.</p>
+
+        <div class="content" id="conteudoPedido">
+            <p style="color: #999;">Insira um código para carregar os detalhes do pedido</p>
         </div>
+
         <div class="print-button">
-            <button onclick="window.print()">Imprimir</button>
+            <button id="btnImprimir">Imprimir</button>
         </div>
     </div>
     <script src="/page_print/print_page.js"></script>

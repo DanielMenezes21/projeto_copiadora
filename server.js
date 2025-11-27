@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const multer = require('multer');
 const pdf = require('pdf-parse');
+const printerManager = require('./printer-manager');
 
 // Definição de caminhos
 const CONFIG_PATH = path.join(__dirname, "config.json");
@@ -175,10 +176,151 @@ app.get("/admin", (req, res) => {
   res.sendFile(path.join(__dirname, "private", "admin.html"));
 });
 
+// --- Rota da página de gerenciamento de impressoras ---
+app.get("/admin/printers", (req, res) => {
+  res.sendFile(path.join(__dirname, "private", "printer-admin", "admin-printers.html"));
+});
+
 // --- Rota da página de impressão ---
 app.get("/print", (req, res) => {
   res.sendFile(path.join(__dirname, "page_print", "print_page.html"));
 });
+
+// ============================================================================
+// ROTAS DE GERENCIAMENTO DE IMPRESSORAS
+// ============================================================================
+
+// --- GET: Obter todas as impressoras ---
+app.get("/api/printers", (req, res) => {
+  try {
+    const config = printerManager.carregarConfiguracaoImpressoras();
+    if (!config) {
+      return res.status(500).json({ error: "Erro ao carregar configuração de impressoras" });
+    }
+    res.json(config.impressoras);
+  } catch (err) {
+    console.error("Erro ao obter impressoras:", err);
+    res.status(500).json({ error: "Erro ao obter impressoras" });
+  }
+});
+
+// --- GET: Obter relatório de status ---
+app.get("/api/printers/status", async (req, res) => {
+  try {
+    await printerManager.atualizarStatusTodas();
+    const relatorio = printerManager.obterRelatorioPrinters();
+    res.json(relatorio);
+  } catch (err) {
+    console.error("Erro ao atualizar status:", err);
+    res.status(500).json({ error: "Erro ao atualizar status das impressoras" });
+  }
+});
+
+// --- GET: Obter impressora específica ---
+app.get("/api/printers/:id", (req, res) => {
+  try {
+    const config = printerManager.carregarConfiguracaoImpressoras();
+    if (!config) {
+      return res.status(500).json({ error: "Erro ao carregar configuração" });
+    }
+    const impressora = config.impressoras.find(imp => imp.id === parseInt(req.params.id));
+    if (!impressora) {
+      return res.status(404).json({ error: "Impressora não encontrada" });
+    }
+    res.json(impressora);
+  } catch (err) {
+    console.error("Erro ao obter impressora:", err);
+    res.status(500).json({ error: "Erro ao obter impressora" });
+  }
+});
+
+// --- POST: Selecionar melhor impressora para um pedido ---
+app.post("/api/printers/select", (req, res) => {
+  try {
+    const pedido = req.body;
+    const impressora = printerManager.selecionarMelhorImpressora(pedido);
+    
+    if (!impressora) {
+      return res.status(400).json({ 
+        error: "Nenhuma impressora compatível encontrada",
+        criterios: pedido
+      });
+    }
+    
+    res.json({
+      mensagem: "Impressora selecionada",
+      impressora: impressora.nome,
+      detalhes: impressora
+    });
+  } catch (err) {
+    console.error("Erro ao selecionar impressora:", err);
+    res.status(500).json({ error: "Erro ao selecionar impressora" });
+  }
+});
+
+// --- POST: Verificar compatibilidade ---
+app.post("/api/printers/verify", (req, res) => {
+  try {
+    const { pedido, impressoraId } = req.body;
+    
+    if (!pedido || !impressoraId) {
+      return res.status(400).json({ error: "Dados incompletos" });
+    }
+    
+    const resultado = printerManager.verificarCompatibilidade(pedido, impressoraId);
+    res.json(resultado);
+  } catch (err) {
+    console.error("Erro ao verificar compatibilidade:", err);
+    res.status(500).json({ error: "Erro ao verificar compatibilidade" });
+  }
+});
+
+// --- POST: Adicionar nova impressora ---
+app.post("/api/printers", (req, res) => {
+  try {
+    const novaImpressora = req.body;
+    
+    if (!novaImpressora.nome || !novaImpressora.ip) {
+      return res.status(400).json({ error: "Nome e IP são obrigatórios" });
+    }
+    
+    const resultado = printerManager.adicionarImpressora(novaImpressora);
+    res.json(resultado);
+  } catch (err) {
+    console.error("Erro ao adicionar impressora:", err);
+    res.status(500).json({ error: "Erro ao adicionar impressora" });
+  }
+});
+
+// --- PUT: Atualizar configuração de uma impressora ---
+app.put("/api/printers/:id", (req, res) => {
+  try {
+    const impressoraId = req.params.id;
+    const atualizacoes = req.body;
+    
+    const resultado = printerManager.atualizarImpressora(impressoraId, atualizacoes);
+    res.json(resultado);
+  } catch (err) {
+    console.error("Erro ao atualizar impressora:", err);
+    res.status(500).json({ error: "Erro ao atualizar impressora" });
+  }
+});
+
+// --- DELETE: Remover uma impressora ---
+app.delete("/api/printers/:id", (req, res) => {
+  try {
+    const impressoraId = req.params.id;
+    const resultado = printerManager.removerImpressora(impressoraId);
+    res.json(resultado);
+  } catch (err) {
+    console.error("Erro ao remover impressora:", err);
+    res.status(500).json({ error: "Erro ao remover impressora" });
+  }
+});
+
+// ============================================================================
+// FIM DAS ROTAS DE GERENCIAMENTO DE IMPRESSORAS
+// ============================================================================
 
 // --- Inicialização do servidor ---
 const PORT = 3000;

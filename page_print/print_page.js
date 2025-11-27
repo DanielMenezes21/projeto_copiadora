@@ -1,13 +1,7 @@
 // =========================
-// CONFIGURAÇÕES LOCAIS
+// CONFIGURAÇÕES
 // =========================
-
-// Caminho do arquivo printers.json local (máquina específica)
-const PRINTERS_URL = "/page_print/printers.json";
-
-// Endereço do servidor central de pedidos
-const API_SERVER = "http://localhost:3000";  // ajuste conforme seu backend
-
+const API_SERVER = "http://localhost:3000";
 
 // =========================
 // FUNÇÃO: Buscar pedido pelo código
@@ -26,178 +20,99 @@ async function buscarPedido(codigo) {
 }
 
 // =========================
-// FUNÇÃO: Buscar impressoras locais
+// FUNÇÃO: Selecionar impressora automaticamente
 // =========================
-async function carregarImpressoras() {
-    const res = await fetch(PRINTERS_URL);
+async function selecionarImpressoraPorPedido(pedido) {
+    const res = await fetch(`${API_SERVER}/api/printers/select`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            colorido: pedido.configuracoes.cor === "colorido",
+            tamanho: pedido.configuracoes.tamanho
+        })
+    });
 
     if (!res.ok) {
-        throw new Error("Falha ao carregar configuração das impressoras locais.");
+        const erro = await res.json();
+        throw new Error(erro.error || "Erro ao selecionar impressora");
     }
 
-    return res.json();
+    const dados = await res.json();
+    return dados;
 }
 
-
 // =========================
-// FUNÇÃO: Verificar compatibilidade
-// =========================
-function selecionarImpressora(pedido, impressoras) {
-
-    for (const nome in impressoras) {
-        const imp = impressoras[nome];
-
-        const suportaCor = pedido.colorido ? imp.colorido : true;
-        const suportaTamanho = imp.tamanhos.includes(pedido.tamanho);
-
-        if (suportaCor && suportaTamanho) {
-            return nome;     // Achou!
-        }
-    }
-
-    return null; // Nenhuma impressora compatível
-}
-
-
-// =========================
-// FUNÇÃO: Realizar a impressão (chama o backend local do Node)
-// =========================
-//async function enviarParaImpressao(codigo, impressora) {
-//    const res = await fetch(`${API_SERVER}/api/imprimir`, {
-//        method: "POST",
-//        headers: { "Content-Type": "application/json"},
-//        body: JSON.stringify({ codigo, impressora })
-//    });
-
-//    const data = await res.json();
-
-//    if (!res.ok) {
-//        throw new Error(data.erro || "Erro ao enviar para impressão.");
-//    }
-
-//    return data;
-//}
-
-async function enviarParaImpressao(codigo, impressora) {
-    console.log("ENVIANDO PARA IMPRESSORA:", impressora, "com código", codigo);
-
-    return { ok: true };
-}
-
-
-// =========================
-// EVENTO: clique no botão "Imprimir"
+// FUNÇÃO: Processar impressão
 // =========================
 async function processarImpressao() {
-    const codigo = prompt("Digite o código de impressão:");
+    const codigoInput = document.getElementById("codigoImpressao");
+    const codigo = codigoInput.value.trim();
 
-    if (!codigo) return;
+    if (!codigo) {
+        alert("❌ Por favor, insira um código de impressão");
+        codigoInput.focus();
+        return;
+    }
 
     try {
-        // 1. Carrega pedido do servidor central
+        console.log("📋 Buscando pedido...");
         const pedido = await buscarPedido(codigo);
 
-        // 2. Carrega impressoras locais
-        const impressoras = await carregarImpressoras();
+        console.log("🖨️ Selecionando impressora compatível...");
+        const resultado = await selecionarImpressoraPorPedido(pedido);
 
-        // 3. Valida compatibilidade
-        const impressoraEscolhida = selecionarImpressora(pedido, impressoras);
-
-        if (!impressoraEscolhida) {
-            alert("⚠ Nenhuma impressora desta máquina suporta este pedido:\n" +
-                `• Colorido: ${pedido.colorido}\n` +
-                `• Tamanho: ${pedido.tamanho}`);
+        if (!resultado.detalhes) {
+            alert("❌ Erro ao selecionar impressora");
             return;
         }
 
-        // 4. Envia para impressão
-        const resultado = await enviarParaImpressao(codigo, impressoraEscolhida);
+        const impressora = resultado.detalhes;
+        const detalhes = `
+📍 Impressora: ${impressora.nome}
+📊 Modelo: ${impressora.modelo}
+🔋 Toner: ${impressora.toner_level}%
+📄 Papel: ${impressora.papel_restante}%
+⚡ Velocidade: ${impressora.capacidades.velocidade_ppm} PPM
 
-        alert(`✅ Pedido enviado para a impressora: ${impressoraEscolhida}`);
+Configurações do Pedido:
+• Cor: ${pedido.configuracoes.cor}
+• Tamanho: ${pedido.configuracoes.tamanho.toUpperCase()}
+• Cópias: ${pedido.configuracoes.copias}
+`;
+
+        alert("✅ Pedido selecionado para impressão!\n" + detalhes);
+
+        // Limpar campo e manter foco
+        codigoInput.value = "";
+        codigoInput.focus();
 
     } catch (err) {
-        console.error(err);
-        alert("Erro: " + err.message);
+        console.error("❌ Erro:", err);
+        alert("❌ Erro: " + err.message);
+        codigoInput.focus();
     }
 }
 
-
 // =========================
-// Conectar botão ao script
+// EVENTO: DOMContentLoaded
 // =========================
 document.addEventListener("DOMContentLoaded", () => {
-    const btn = document.querySelector("button");
+    const btnImprimir = document.getElementById("btnImprimir");
+    const codigoInput = document.getElementById("codigoImpressao");
 
-    if (!btn) return;
+    if (btnImprimir) {
+        btnImprimir.addEventListener("click", (event) => {
+            event.preventDefault();
+            processarImpressao();
+        });
+    }
 
-    btn.addEventListener("click", (event) => {
-        event.preventDefault(); // impede o print normal do navegador
-        processarImpressao();
-    });
+    // Permitir Enter para imprimir
+    if (codigoInput) {
+        codigoInput.addEventListener("keypress", (event) => {
+            if (event.key === "Enter") {
+                processarImpressao();
+            }
+        });
+    }
 });
-
-// --- NOVA ROTA: Upload de arquivo + salvar dados no histórico ---
-app.post("/api/historic/upload", upload.single("file"), (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: "Nenhum arquivo enviado." });
-    }
-
-    const {
-      codigo,
-      datetime,
-      valor,
-      copias,
-      cor,
-      tamanho,
-      paginas,
-      frenteVerso,
-      orientacao
-    } = req.body;
-
-    // Validação mínima
-    if (!codigo || !datetime) {
-      return res.status(400).json({ error: "Dados obrigatórios faltando." });
-    }
-
-    // Garantir que o arquivo JSON existe
-    if (!fs.existsSync(HISTORIC_PATH)) {
-      fs.writeFileSync(HISTORIC_PATH, JSON.stringify([], null, 2));
-    }
-
-    let data = JSON.parse(fs.readFileSync(HISTORIC_PATH, "utf-8"));
-
-    const nextId = data.length > 0 ? Math.max(...data.map(d => d.id)) + 1 : 1;
-
-    const entry = {
-      id: nextId,
-      codigo,
-      datetime,
-      documento: req.file.filename, // nome do arquivo salvo
-      valor: parseFloat(valor) || 0,
-
-      configuracoes: {
-        copias: parseInt(copias) || 1,
-        cor: cor || "preto-branco",
-        tamanho: tamanho || "a4",
-        paginas: parseInt(paginas) || 1,
-        frenteVerso: frenteVerso === "true",
-        orientacao: orientacao || "retrato"
-      }
-    };
-
-    data.push(entry);
-
-    fs.writeFileSync(HISTORIC_PATH, JSON.stringify(data, null, 2));
-
-    res.json({
-      message: "Upload concluído e dados salvos",
-      entry
-    });
-
-  } catch (err) {
-    console.error("Erro no upload:", err);
-    res.status(500).json({ error: "Erro ao salvar o pedido" });
-  }
-});
-
