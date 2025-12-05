@@ -20,6 +20,27 @@
       "status": "online",
       "toner_level": 100,
       "papel_restante": 100
+    },
+    {
+      "nome": "Xerox altalink",
+      "modelo": "C8035",
+      "tipo": "multifuncional",
+      "ip": "192.168.10.125",
+      "puerto": 9100,
+      "ativa": true,
+      "capacidades": {
+        "colorido": true,
+        "preto_branco": true,
+        "tamanhos": [
+          "a4"
+        ],
+        "duplex": true,
+        "velocidade_ppm": 35
+      },
+      "status": "online",
+      "toner_level": 100,
+      "papel_restante": 100,
+      "id": 5
     }
   ]
 }

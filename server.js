@@ -327,7 +327,7 @@ app.delete("/api/printers/:id", (req, res) => {
 
 app.post("/api/print", async (req, res) => {
   try {
-    const { impressoraId, documento, copias = 1 } = req.body;
+    const { impressoraId, documento, copias = 1, frenteVerso = false } = req.body;
 
     // Validar entrada
     if (!impressoraId || !documento) {
@@ -367,13 +367,15 @@ app.post("/api/print", async (req, res) => {
     console.log(`   Impressora: ${impressora.nome} (${impressora.ip}:${impressora.puerto})`);
     console.log(`   Arquivo: ${documento}`);
     console.log(`   Cópias: ${copias}`);
+    console.log(`   Duplex (Frente/Verso): ${frenteVerso ? 'Sim' : 'Não'}`);
 
     // Enviar para impressora
     const resultado = await printService.imprimirArquivo(
       impressora.ip,
       impressora.puerto,
       caminhoArquivo,
-      copias
+      copias,
+      frenteVerso
     );
 
     console.log(`✅ Impressão concluída!\n`);
