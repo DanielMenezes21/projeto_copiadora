@@ -327,11 +327,10 @@ app.delete("/api/printers/:id", (req, res) => {
 
 app.post("/api/print", async (req, res) => {
   try {
-    const { impressoraId, documento, copias = 1, frenteVerso = false } = req.body;
+    const { documento, copias = 1, frenteVerso = false } = req.body;
 
-    // Validar entrada
-    if (!impressoraId || !documento) {
-      return res.status(400).json({ error: "ID da impressora e documento são obrigatórios" });
+    if (!documento) {
+      return res.status(400).json({ error: "Documento é obrigatório" });
     }
 
     // Carregar configuração das impressoras
@@ -340,39 +339,29 @@ app.post("/api/print", async (req, res) => {
       return res.status(500).json({ error: "Erro ao carregar configuração de impressoras" });
     }
 
-    // Encontrar impressora
-    const impressora = config.impressoras.find(imp => imp.id === parseInt(impressoraId));
-    if (!impressora) {
-      return res.status(404).json({ error: "Impressora não encontrada" });
-    }
-
-    // Verificar se está ativa e online
-    if (!impressora.ativa) {
-      return res.status(400).json({ error: "Impressora desativada" });
-    }
-
-    if (impressora.status !== "online") {
-      return res.status(400).json({ error: "Impressora offline" });
+    // Filtrar impressoras ativas e online
+    const impressorasValidas = config.impressoras.filter(imp => imp.ativa && imp.status === "online");
+    if (!impressorasValidas.length) {
+      return res.status(400).json({ error: "Nenhuma impressora ativa e online disponível" });
     }
 
     // Construir caminho do arquivo
     const caminhoArquivo = path.join(__dirname, "uploads", documento);
-
-    // Verificar se arquivo existe
     if (!fs.existsSync(caminhoArquivo)) {
       return res.status(404).json({ error: "Arquivo não encontrado: " + documento });
     }
 
-    console.log(`\n📤 Enviando para impressão:`);
-    console.log(`   Impressora: ${impressora.nome} (${impressora.ip}:${impressora.puerto})`);
+    console.log(`\n📤 Tentando imprimir em ${impressorasValidas.length} impressora(s):`);
+    impressorasValidas.forEach(imp => {
+      console.log(` - ${imp.nome} (${imp.ip}:${imp.puerto})`);
+    });
     console.log(`   Arquivo: ${documento}`);
     console.log(`   Cópias: ${copias}`);
     console.log(`   Duplex (Frente/Verso): ${frenteVerso ? 'Sim' : 'Não'}`);
 
-    // Enviar para impressora
-    const resultado = await printService.imprimirArquivo(
-      impressora.ip,
-      impressora.puerto,
+    // Tentar imprimir em todas, na ordem, até uma funcionar
+    const resultado = await printService.imprimirEmLista(
+      impressorasValidas,
       caminhoArquivo,
       copias,
       frenteVerso
@@ -382,13 +371,7 @@ app.post("/api/print", async (req, res) => {
 
     res.json({
       sucesso: true,
-      mensagem: resultado,
-      impressora: {
-        id: impressora.id,
-        nome: impressora.nome,
-        modelo: impressora.modelo,
-        ip: impressora.ip
-      }
+      mensagem: resultado
     });
 
   } catch (err) {

@@ -1,3 +1,25 @@
+/**
+ * Tenta imprimir em uma lista de impressoras, na ordem, até uma funcionar
+ * @param {Array} impressoras - Array de objetos {ip, puerto, ...}
+ * @param {string} caminhoArquivo - Caminho do arquivo a imprimir
+ * @param {number} copias - Número de cópias
+ * @param {boolean} frenteVerso - Se true, imprime frente e verso
+ * @returns {Promise<string>} Mensagem de sucesso ou lança erro se todas falharem
+ */
+async function imprimirEmLista(impressoras, caminhoArquivo, copias = 1, frenteVerso = false) {
+    let ultimaMensagemErro = '';
+    for (const imp of impressoras) {
+        try {
+            const msg = await imprimirArquivo(imp.ip, imp.puerto, caminhoArquivo, copias, frenteVerso);
+            return `Impressão enviada para ${imp.nome || imp.ip}: ${msg}`;
+        } catch (err) {
+            ultimaMensagemErro = `Falha em ${imp.nome || imp.ip}: ${err.message}`;
+            console.warn(ultimaMensagemErro);
+        }
+    }
+    throw new Error(`Nenhuma impressora disponível. Último erro: ${ultimaMensagemErro}`);
+}
+
 const net = require("net");
 const fs = require("fs");
 const path = require("path");
