@@ -15,7 +15,7 @@
       </div>
       <nav>
         <a href="#" class="active" data-section="config"><i class="fa-solid fa-sliders"></i> Configurações</a>
-        <a href="/admin/printers" target="_blank"><i class="fa-solid fa-print"></i> Gerenciar Impressoras</a>
+        <a href="#" data-section="printers"><i class="fa-solid fa-print"></i> Gerenciar Impressoras</a>
         <a href="#" data-section="reports"><i class="fa-solid fa-chart-line"></i> Relatórios</a>
         <a href="#"><i class="fa-solid fa-users"></i> Usuários</a>
         <a href="#"><i class="fa-solid fa-gear"></i> Sistema</a>
@@ -67,6 +67,28 @@
           <button id="salvar"><i class="fa-solid fa-floppy-disk"></i> Salvar Configurações</button>
         </div>
         <p id="statusMsg"></p>
+      </section>
+
+      <!-- Seção de Gerenciar Impressoras -->
+      <section class="card" id="printers-section" style="display: none;">
+        <h2><i class="fa-solid fa-print"></i> Gerenciar Impressoras por Local</h2>
+
+        <div class="form-grid">
+          <div class="input-group">
+            <label for="locationSelect">Local:</label>
+            <select id="locationSelect">
+              <option value="">-- Selecionar local --</option>
+              <option value="sala-central">Sala Central</option>
+              <option value="recepcao">Recepção</option>
+              <option value="biblioteca">Biblioteca</option>
+              <option value="laboratorio">Laboratório</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="printersList" class="printers-list">
+          <p id="printersMessage">Selecione um local para ver as impressoras cadastradas.</p>
+        </div>
       </section>
 
       <!-- Seção de Relatórios -->

@@ -9,7 +9,8 @@ const statusMsg = document.getElementById("statusMsg");
 const navLinks = document.querySelectorAll('nav a');
 const sections = {
   'config': document.querySelector('.card'),
-  'reports': document.getElementById('reports-section')
+  'reports': document.getElementById('reports-section'),
+  'printers': document.getElementById('printers-section')
 };
 
 navLinks.forEach(link => {
@@ -27,6 +28,30 @@ navLinks.forEach(link => {
     });
   });
 });
+
+const locationSelect = document.getElementById('locationSelect');
+const printersList = document.getElementById('printersList');
+const printersMessage = document.getElementById('printersMessage');
+
+function renderPrintersForLocation(location) {
+  // Por enquanto não há impressoras cadastradas — mostrará mensagem padrão
+  printersList.innerHTML = '';
+  const p = document.createElement('p');
+  p.style.color = '#666';
+  p.textContent = 'Não há impressoras cadastradas neste local.';
+  printersList.appendChild(p);
+}
+
+if (locationSelect) {
+  locationSelect.addEventListener('change', (e) => {
+    const loc = e.target.value;
+    if (!loc) {
+      printersList.innerHTML = '<p id="printersMessage">Selecione um local para ver as impressoras cadastradas.</p>';
+      return;
+    }
+    renderPrintersForLocation(loc);
+  });
+}
 
 // Carrega os valores atuais ao abrir o painel
 async function carregarConfig() {
