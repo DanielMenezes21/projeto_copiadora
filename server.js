@@ -1,4 +1,5 @@
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const fs = require("fs");
 const path = require("path");
 const multer = require('multer');
@@ -30,15 +31,29 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+
 // Inicializar Express
 const app = express();
+app.use(cookieParser());
 
 // Middlewares
 app.use(express.json());
+
 app.use(express.static(path.join(__dirname, "public")));
-app.use("/private", express.static(path.join(__dirname, "private")));
-// Servir os arquivos estáticos da interface de impressão (CSS/JS)
 app.use("/page_print", express.static(path.join(__dirname, "page_print")));
+
+// Middleware de autenticação para admin
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123"; // Troque a senha aqui
+function requireAdminAuth(req, res, next) {
+  if (req.cookies && req.cookies.admin_auth === "ok") {
+    return next();
+  }
+  // Se não autenticado, redireciona para login
+  res.redirect("/admin/login");
+}
+
+// Servir arquivos privados apenas se autenticado
+app.use("/private", requireAdminAuth, express.static(path.join(__dirname, "private")));
 
 // --- Rota para obter valores de configuração ---
 app.get("/api/config", (req, res) => {
@@ -174,13 +189,53 @@ app.post('/api/parse-pages', upload.single('file'), async (req, res) => {
   }
 });
 
+
+// --- Rota de login do admin ---
+app.get("/admin/login", (req, res) => {
+  res.send(`<!DOCTYPE html>
+  <html lang='pt-BR'>
+  <head>
+    <meta charset='UTF-8'>
+    <title>Login Admin</title>
+    <style>
+      body { background: #f8fafc; font-family: Arial,sans-serif; }
+      .login-box { max-width: 340px; margin: 80px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 12px #0001; padding: 2em; }
+      h2 { color: #2563eb; text-align: center; }
+      label { font-weight: bold; }
+      input[type=password] { width: 100%; padding: 0.7em; margin: 1em 0; border-radius: 6px; border: 1px solid #cbd5e1; }
+      button { width: 100%; background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: 0.7em; font-size: 1em; cursor: pointer; }
+      button:hover { background: #1d4ed8; }
+      .msg { color: #ef4444; text-align: center; margin-bottom: 1em; }
+    </style>
+  </head>
+  <body>
+    <form class='login-box' method='POST' action='/admin/login'>
+      <h2>Login Admin</h2>
+      <div class='msg'>${req.query.error ? "Senha incorreta!" : ""}</div>
+      <label for='senha'>Senha de administrador:</label>
+      <input type='password' id='senha' name='senha' required autofocus autocomplete='current-password'>
+      <button type='submit'>Entrar</button>
+    </form>
+  </body>
+  </html>`);
+});
+
+app.post("/admin/login", express.urlencoded({ extended: true }), (req, res) => {
+  const senha = req.body.senha;
+  if (senha === ADMIN_PASSWORD) {
+    res.cookie("admin_auth", "ok", { httpOnly: true });
+    return res.redirect("/admin");
+  }
+  res.redirect("/admin/login?error=1");
+});
+
 // --- Rota da página de administração ---
-app.get("/admin", (req, res) => {
+app.get("/admin", requireAdminAuth, (req, res) => {
   res.sendFile(path.join(__dirname, "private", "admin.html"));
 });
 
 // --- Rota da página de gerenciamento de impressoras ---
-app.get("/admin/printers", (req, res) => {
+app.get("/admin/printers", requireAdminAuth, (req, res) => {
   res.sendFile(path.join(__dirname, "private", "printer-admin", "admin-printers.html"));
 });
 

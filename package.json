@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/DanielMenezes21/projeto_copiadora#readme",
   "dependencies": {
+    "cookie-parser": "^1.4.7",
     "express": "^5.1.0",
     "multer": "^1.4.5-lts.2",
     "pdf-parse": "^1.1.1"

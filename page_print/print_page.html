@@ -3,31 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Impressão</title>
     <link rel="stylesheet" href="/page_print/print_page.css">
-    <title>Página de Impressão</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <h1>Sistema de Impressão</h1>
+        <header>
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <i class="fas fa-print"></i>
+                </div>
+                <div>
+                    <div class="logo-text">PrintSystem</div>
+                    <div class="logo-subtitle">Sistema de Gestão de Impressões</div>
+                </div>
+            </div>
+            
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span>Usuário: Admin</span>
+            </div>
+        </header>
         
-        <div class="input-section">
-            <label for="codigoImpressao">Código de Impressão:</label>
-            <input 
-                type="text" 
-                id="codigoImpressao" 
-                placeholder="Digite o código do pedido"
-                autofocus
-            />
-        </div>
-
-        <div class="content" id="conteudoPedido">
-            <p style="color: #999;">Insira um código para carregar os detalhes do pedido</p>
-        </div>
-
-        <div class="print-button">
-            <button id="btnImprimir">Imprimir</button>
-        </div>
+        <main>
+            <div class="main-header">
+                <h1>Sistema de Impressão</h1>
+                <p>Digite o código do pedido para visualizar e imprimir</p>
+            </div>
+            
+            <div class="content">
+                <div class="input-section">
+                    <div class="custom-label">
+                        <i class="fas fa-search custom-label-icon"></i>
+                        Código de Impressão:
+                    </div>
+                    
+                    <div class="input-container">
+                        <input 
+                            type="text" 
+                            id="codigoImpressao" 
+                            class="custom-input"
+                            placeholder="Ex: IMP-0000AA"
+                            autofocus
+                        />
+                        <button id="btnBuscar" class="search-btn">
+                            <i class="fas fa-search"></i>
+                            Buscar
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="response-area" id="conteudoPedido">
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="far fa-file-alt"></i>
+                        </div>
+                        <h3>Nenhum pedido carregado</h3>
+                        <p>Insira um código válido para visualizar os detalhes do pedido</p>
+                    </div>
+                    
+                    <div class="loading" id="loadingState">
+                        <div class="spinner"></div>
+                        <p>Buscando informações do pedido...</p>
+                    </div>
+                    
+                    <div class="order-details" id="orderDetails">
+                        <!-- Conteúdo será preenchido via JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="btnLimpar" class="btn btn-secondary">
+                        <i class="fas fa-trash-alt"></i>
+                        Limpar
+                    </button>
+                    <button id="btnImprimir" class="btn btn-primary" disabled>
+                        <i class="fas fa-print"></i>
+                        Imprimir
+                    </button>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p><i class="far fa-copyright"></i> 2025 PrintSystem. Todos os direitos reservados.</p>
+        </footer>
     </div>
+
     <script src="/page_print/print_page.js"></script>
 </body>
 </html>
+

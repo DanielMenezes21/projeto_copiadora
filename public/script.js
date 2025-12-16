@@ -388,23 +388,84 @@ document.getElementById("finalizar").addEventListener("click", async () => {
 // ----------------------
 // ETAPA 5: Reiniciar
 // ----------------------
+
 document.getElementById("novo-pedido").addEventListener("click", () => {
+  // Gera comprovante antes de reiniciar
+  gerarComprovante();
+  // Reinicia o fluxo normalmente
   alert("Novo pedido iniciado.");
   goToStep(1);
   fileInput.value = "";
   uploadText.innerHTML = `Arraste seu arquivo aqui ou <span class="select-file">clique para selecionar</span><br>
     <small>(Apenas PDF ou Word)</small>`;
   next1.disabled = true;
-  
   if (termoCheckbox) termoCheckbox.checked = false;
   if (arquivoSelecionadoEl) arquivoSelecionadoEl.innerHTML = '';
-  
   const pageCountEl = document.getElementById('page-count');
   if (pageCountEl) pageCountEl.textContent = '';
-  
   detectedPages = 1;
   setNext1Enabled();
 });
+
+// Função para gerar comprovante HTML e abrir para impressão/download
+function gerarComprovante() {
+  // Dados do pedido
+  const codigo = document.getElementById("codigo-gerado").innerText;
+  const dataHora = new Date().toLocaleString();
+  const arquivo = fileInput.files && fileInput.files[0] ? fileInput.files[0].name : '-';
+  const valor = valorImpressao.toFixed(2);
+  const copias = parseInt(copiasInput.value) || 1;
+  const cor = corSelect.value === 'colorido' ? 'Colorido' : 'Preto e Branco';
+  const tamanho = tamanhoSelect.value.toUpperCase();
+  const paginas = detectedPages || 1;
+  const frenteVerso = frenteVersoCheck.checked ? 'Sim' : 'Não';
+  const orientacao = document.getElementById('orientacao').value === 'paisagem' ? 'Paisagem' : 'Retrato';
+
+  const html = `<!DOCTYPE html>
+  <html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <title>Comprovante de Pedido</title>
+    <style>
+      body { font-family: Arial, sans-serif; background: #f8fafc; color: #222; margin: 0; padding: 2em; }
+      .comprovante-box { background: #fff; max-width: 480px; margin: 2em auto; border-radius: 12px; box-shadow: 0 2px 12px #0001; padding: 2em; }
+      h1 { color: #2563eb; font-size: 1.5em; margin-bottom: 0.5em; }
+      .info { margin-bottom: 1.2em; }
+      .info strong { display: inline-block; width: 140px; color: #475569; }
+      .linha { border-top: 1px solid #e2e8f0; margin: 1.5em 0; }
+      .valor { font-size: 1.2em; color: #10b981; font-weight: bold; }
+      .print-btn { margin-top: 1.5em; padding: 0.7em 2em; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-size: 1em; cursor: pointer; }
+      .print-btn:hover { background: #1d4ed8; }
+    </style>
+  </head>
+  <body>
+    <div class="comprovante-box">
+      <h1>Comprovante de Pedido</h1>
+      <div class="info"><strong>Código:</strong> ${codigo}</div>
+      <div class="info"><strong>Data/Hora:</strong> ${dataHora}</div>
+      <div class="info"><strong>Arquivo:</strong> ${arquivo}</div>
+      <div class="info"><strong>Valor Pago:</strong> <span class="valor">R$ ${valor}</span></div>
+      <div class="linha"></div>
+      <div class="info"><strong>Cópias:</strong> ${copias}</div>
+      <div class="info"><strong>Páginas:</strong> ${paginas}</div>
+      <div class="info"><strong>Cor:</strong> ${cor}</div>
+      <div class="info"><strong>Tamanho:</strong> ${tamanho}</div>
+      <div class="info"><strong>Frente/Verso:</strong> ${frenteVerso}</div>
+      <div class="info"><strong>Orientação:</strong> ${orientacao}</div>
+      <button class="print-btn" onclick="window.print()">Imprimir / Salvar PDF</button>
+    </div>
+  </body>
+  </html>`;
+
+  // Abre comprovante em nova janela
+  const win = window.open('', '_blank');
+  if (win) {
+    win.document.write(html);
+    win.document.close();
+  } else {
+    alert('Não foi possível abrir o comprovante. Verifique o bloqueador de pop-ups.');
+  }
+}
 
 // ----------------------
 // Função: Código de Impressão
