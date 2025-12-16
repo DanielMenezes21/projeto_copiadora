@@ -43,20 +43,5 @@
       "frenteVerso": false,
       "orientacao": "retrato"
     }
-  },
-  {
-    "id": 4,
-    "codigo": "IMP-6460UM",
-    "datetime": "2025-12-16T19:44:40.097Z",
-    "documento": "Relatorio_Final_Estagio_Supervisionado_formatado.pdf",
-    "valor": 7,
-    "configuracoes": {
-      "copias": 1,
-      "cor": "preto-branco",
-      "tamanho": "a4",
-      "paginas": 14,
-      "frenteVerso": false,
-      "orientacao": "retrato"
-    }
   }
 ]
