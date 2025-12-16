@@ -115,5 +115,6 @@ async function imprimirArquivo(ip, porta, caminhoArquivo, copias = 1, frenteVers
 
 module.exports = {
     enviarParaImpressora,
-    imprimirArquivo
+    imprimirArquivo,
+    imprimirEmLista
 };
