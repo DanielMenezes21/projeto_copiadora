@@ -1,7 +1,7 @@
 // =========================
 // CONFIGURAÇÕES
 // =========================
-const API_SERVER = "http://localhost:3000"; // Altere para o endereço do seu servidor de impressão
+const API_SERVER = "https://projeto-copiadora.onrender.com"; // Altere para o endereço do seu servidor de impressão
 
 // =========================
 // FUNÇÃO: Buscar pedido pelo código
