@@ -28,8 +28,6 @@ navLinks.forEach(link => {
   });
 });
 
-// ...restante do código...
-
 // Carrega os valores atuais ao abrir o painel
 async function carregarConfig() {
   try {
