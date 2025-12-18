@@ -1,0 +1,25 @@
+// Este arquivo será usado para logs detalhados da rota /api/print
+// O server.js irá gravar aqui cada requisição, resposta e erro do endpoint de impressão.
+// Se não existir, será criado automaticamente pelo backend.
+[2025-12-18T20:37:00.857Z] {
+  "etapa": "recebido",
+  "body": {
+    "impressoraId": 4,
+    "documento": "Comprovante de Pedido.pdf",
+    "copias": 1
+  }
+}
+[2025-12-18T20:37:00.859Z] {
+  "etapa": "impressao",
+  "impressoras": [
+    "RICOH aficio MP 5002",
+    "Xerox altalink"
+  ],
+  "arquivo": "Comprovante de Pedido.pdf",
+  "copias": 1,
+  "frenteVerso": false
+}
+[2025-12-18T20:37:00.870Z] {
+  "etapa": "sucesso",
+  "resultado": "Impressão enviada para RICOH aficio MP 5002: Impressão enviada com sucesso"
+}

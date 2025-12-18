@@ -10,7 +10,7 @@ const printService = require('./print-service');
 const { MercadoPagoConfig, Preference, Payment } = require('mercadopago');
 
 const client = new MercadoPagoConfig({
-  accessToken: 'TEST-3891197388635513-121815-14f3126b4a3e94fed2bba14ab2d7431c-3077287732'
+  accessToken: 'APP_USR-3891197388635513-121815-7e0854c72c5e385ee83e5eb2fbf8cd20-3077287732'
 });
 
 const payment = new Payment(client);
@@ -41,7 +41,13 @@ const upload = multer({ storage });
 const app = express();
 app.use(cookieParser());
 
-// Middlewares
+
+// Middleware para logar todas as requisições recebidas
+app.use((req, res, next) => {
+  console.log(`[REQ] ${req.method} ${req.url} | body:`, req.body);
+  next();
+});
+
 app.use(express.json());
 
 app.use(express.static(path.join(__dirname, "public")));
@@ -386,38 +392,47 @@ app.delete("/api/printers/:id", (req, res) => {
 // ============================================================================
 
 app.post("/api/print", async (req, res) => {
+  // Loga no terminal para debug imediato
+  console.log('[API/PRINT] Requisição recebida:', req.body);
+  const debugLogPath = path.resolve(__dirname, 'print_debug.log');
+  const log = (obj) => {
+    try {
+      fs.appendFileSync(debugLogPath, `[${new Date().toISOString()}] ${JSON.stringify(obj, null, 2)}\n`);
+    } catch (e) {
+      console.error('Erro ao gravar print_debug.log:', e);
+    }
+  };
+  log({ etapa: 'recebido', body: req.body });
   try {
     const { documento, copias = 1, frenteVerso = false } = req.body;
 
     if (!documento) {
+      log({ etapa: 'erro', error: 'Documento é obrigatório' });
       return res.status(400).json({ error: "Documento é obrigatório" });
     }
 
     // Carregar configuração das impressoras
     const config = printerManager.carregarConfiguracaoImpressoras();
     if (!config) {
+      log({ etapa: 'erro', error: 'Erro ao carregar configuração de impressoras' });
       return res.status(500).json({ error: "Erro ao carregar configuração de impressoras" });
     }
 
     // Filtrar impressoras ativas e online
     const impressorasValidas = config.impressoras.filter(imp => imp.ativa && imp.status === "online");
     if (!impressorasValidas.length) {
+      log({ etapa: 'erro', error: 'Nenhuma impressora ativa e online disponível' });
       return res.status(400).json({ error: "Nenhuma impressora ativa e online disponível" });
     }
 
     // Construir caminho do arquivo
     const caminhoArquivo = path.join(__dirname, "uploads", documento);
     if (!fs.existsSync(caminhoArquivo)) {
+      log({ etapa: 'erro', error: 'Arquivo não encontrado', arquivo: documento });
       return res.status(404).json({ error: "Arquivo não encontrado: " + documento });
     }
 
-    console.log(`\n📤 Tentando imprimir em ${impressorasValidas.length} impressora(s):`);
-    impressorasValidas.forEach(imp => {
-      console.log(` - ${imp.nome} (${imp.ip}:${imp.puerto})`);
-    });
-    console.log(`   Arquivo: ${documento}`);
-    console.log(`   Cópias: ${copias}`);
-    console.log(`   Duplex (Frente/Verso): ${frenteVerso ? 'Sim' : 'Não'}`);
+    log({ etapa: 'impressao', impressoras: impressorasValidas.map(i => i.nome), arquivo: documento, copias, frenteVerso });
 
     // Tentar imprimir em todas, na ordem, até uma funcionar
     const resultado = await printService.imprimirEmLista(
@@ -427,16 +442,16 @@ app.post("/api/print", async (req, res) => {
       frenteVerso
     );
 
-    console.log(`✅ Impressão concluída!\n`);
-
+    log({ etapa: 'sucesso', resultado });
     res.json({
       sucesso: true,
       mensagem: resultado
     });
 
   } catch (err) {
-    console.error("❌ Erro ao imprimir:", err.message);
-    res.status(500).json({ error: err.message });
+    log({ etapa: 'catch', error: err && err.message, stack: err && err.stack });
+    console.error("❌ Erro ao imprimir:", err && err.message);
+    res.status(500).json({ error: err && err.message });
   }
 });
 
@@ -503,6 +518,7 @@ app.get('/api/pagamento/status/:id', async (req, res) => {
 
 // --- Inicialização do servidor ---
 const PORT = 3000;
+console.log('Iniciando servidor Express...');
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
 });

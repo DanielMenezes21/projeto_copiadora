@@ -1,30 +1,38 @@
 // =========================
 // CONFIGURAÇÕES
 // =========================
-const API_SERVER = "https://projeto-copiadora.onrender.com"; // Altere para o endereço do seu servidor de impressão
+const API_SERVER = "https://projeto-copiadora.onrender.com"; // Sempre tenta o remoto primeiro
+const API_SERVER_LOCAL = "http://localhost:3000";
 
 // =========================
 // FUNÇÃO: Buscar pedido pelo código
 // =========================
 async function buscarPedido(codigo) {
     let lista = [];
+    console.log('[LOG] buscarPedido: Iniciando busca do pedido', codigo);
     // Tenta buscar no Render
     try {
+        console.log('[LOG] buscarPedido: Buscando no Render...');
         const res = await fetch("https://projeto-copiadora.onrender.com/api/historic");
         lista = await res.json();
+        console.log('[LOG] buscarPedido: Sucesso Render, itens:', lista.length);
     } catch (e) {
-        // Se falhar, tenta buscar no localhost
+        console.warn('[LOG] buscarPedido: Falha Render, tentando localhost...');
         try {
             const resLocal = await fetch("http://localhost:3000/api/historic");
             lista = await resLocal.json();
+            console.log('[LOG] buscarPedido: Sucesso Localhost, itens:', lista.length);
         } catch (err) {
+            console.error('[LOG] buscarPedido: Falha Localhost', err);
             throw new Error("Não foi possível buscar pedidos no servidor.");
         }
     }
     const pedido = lista.find(item => item.codigo == codigo);
     if (!pedido) {
+        console.warn('[LOG] buscarPedido: Código não encontrado', codigo);
         throw new Error("Código não encontrado no histórico");
     }
+    console.log('[LOG] buscarPedido: Pedido encontrado', pedido);
     return pedido;
 }
 
@@ -32,21 +40,42 @@ async function buscarPedido(codigo) {
 // FUNÇÃO: Selecionar impressora automaticamente
 // =========================
 async function selecionarImpressoraPorPedido(pedido) {
-    const res = await fetch(`${API_SERVER}/api/printers/select`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            colorido: pedido.configuracoes.cor === "colorido",
-            tamanho: pedido.configuracoes.tamanho
-        })
-    });
-
-    if (!res.ok) {
-        const erro = await res.json();
-        throw new Error(erro.error || "Erro ao selecionar impressora");
+    console.log('[LOG] selecionarImpressoraPorPedido: Enviando pedido para seleção', pedido);
+    let res, erro;
+    // Tenta no servidor remoto
+    try {
+        res = await fetch(`${API_SERVER}/api/printers/select`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                colorido: pedido.configuracoes.cor === "colorido",
+                tamanho: pedido.configuracoes.tamanho
+            })
+        });
+        if (!res.ok) throw new Error('Remote server error');
+    } catch (e) {
+        console.warn('[LOG] selecionarImpressoraPorPedido: Falha no remoto, tentando localhost...');
+        try {
+            res = await fetch(`${API_SERVER_LOCAL}/api/printers/select`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    colorido: pedido.configuracoes.cor === "colorido",
+                    tamanho: pedido.configuracoes.tamanho
+                })
+            });
+            if (!res.ok) throw new Error('Localhost error');
+        } catch (err) {
+            erro = err;
+        }
     }
-
+    if (!res || !res.ok) {
+        erro = erro || (await res.json());
+        console.error('[LOG] selecionarImpressoraPorPedido: Erro', erro);
+        throw new Error(erro.error || erro.message || "Erro ao selecionar impressora");
+    }
     const dados = await res.json();
+    console.log('[LOG] selecionarImpressoraPorPedido: Impressora selecionada', dados);
     return dados;
 }
 
@@ -54,22 +83,44 @@ async function selecionarImpressoraPorPedido(pedido) {
 // FUNÇÃO: Enviar para impressora
 // =========================
 async function enviarParaImpressora(impressoraId, documento, copias) {
-    const res = await fetch(`${API_SERVER}/api/print`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            impressoraId: impressoraId,
-            documento: documento,
-            copias: copias
-        })
-    });
-
-    if (!res.ok) {
-        const erro = await res.json();
-        throw new Error(erro.error || "Erro ao enviar para impressora");
+    console.log('[LOG] enviarParaImpressora: Enviando para impressora', { impressoraId, documento, copias });
+    let res, erro;
+    // Tenta no servidor remoto
+    try {
+        res = await fetch(`${API_SERVER}/api/print`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                impressoraId: impressoraId,
+                documento: documento,
+                copias: copias
+            })
+        });
+        if (!res.ok) throw new Error('Remote server error');
+    } catch (e) {
+        console.warn('[LOG] enviarParaImpressora: Falha no remoto, tentando localhost...');
+        try {
+            res = await fetch(`${API_SERVER_LOCAL}/api/print`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    impressoraId: impressoraId,
+                    documento: documento,
+                    copias: copias
+                })
+            });
+            if (!res.ok) throw new Error('Localhost error');
+        } catch (err) {
+            erro = err;
+        }
     }
-
+    if (!res || !res.ok) {
+        erro = erro || (await res.json());
+        console.error('[LOG] enviarParaImpressora: Erro', erro);
+        throw new Error(erro.error || erro.message || "Erro ao enviar para impressora");
+    }
     const dados = await res.json();
+    console.log('[LOG] enviarParaImpressora: Resposta', dados);
     return dados;
 }
 
@@ -80,6 +131,7 @@ async function processarImpressao() {
     const codigoInput = document.getElementById("codigoImpressao");
     const codigo = codigoInput.value.trim();
 
+    console.log('[LOG] processarImpressao: Início', { codigo });
     if (!codigo) {
         alert("❌ Por favor, insira um código de impressão");
         codigoInput.focus();
@@ -94,6 +146,7 @@ async function processarImpressao() {
         const resultado = await selecionarImpressoraPorPedido(pedido);
 
         if (!resultado.detalhes) {
+            console.warn('[LOG] processarImpressao: Falha ao selecionar impressora', resultado);
             alert("❌ Erro ao selecionar impressora");
             return;
         }
@@ -122,6 +175,7 @@ Configurações do Pedido:
             pedido.configuracoes.copias
         );
 
+        console.log('[LOG] processarImpressao: Impressão enviada', resultadoImpressao);
         alert("✅ " + resultadoImpressao.mensagem);
 
         // Limpar campo e manter foco
