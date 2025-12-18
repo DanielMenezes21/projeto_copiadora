@@ -36,7 +36,7 @@ const path = require("path");
 function enviarParaImpressora(ip, porta, dados, copias = 1, frenteVerso = false) {
     return new Promise((resolve, reject) => {
         const socket = new net.Socket();
-        const timeout = 10000; // 10 segundos
+        const timeout = 20000; // 20 segundos
 
         socket.setTimeout(timeout);
 
