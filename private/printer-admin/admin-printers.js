@@ -102,6 +102,7 @@ function exibirImpressoras(impressoras) {
             
             <div class="printer-actions">
                 <button class="btn-edit" onclick="editarImpressora(${imp.id})">✏️ Editar</button>
+                <button class="btn-pdf" style="background:#ff9800;color:white;" onclick="imprimirPDFGenerico(${imp.id})">📄 Imprimir PDF Genérico</button>
                 <button class="btn-delete" onclick="deletarImpressora(${imp.id})">🗑️ Deletar</button>
             </div>
         </div>

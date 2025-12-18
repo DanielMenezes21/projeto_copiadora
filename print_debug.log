@@ -23,3 +23,25 @@
   "etapa": "sucesso",
   "resultado": "Impressão enviada para RICOH aficio MP 5002: Impressão enviada com sucesso"
 }
+[2025-12-18T22:03:43.457Z] {
+  "etapa": "recebido",
+  "body": {
+    "impressoraId": 4,
+    "documento": "Comprovante de Pedido.pdf",
+    "copias": 1
+  }
+}
+[2025-12-18T22:03:43.459Z] {
+  "etapa": "impressao",
+  "impressoras": [
+    "RICOH aficio MP 5002",
+    "Xerox altalink"
+  ],
+  "arquivo": "Comprovante de Pedido.pdf",
+  "copias": 1,
+  "frenteVerso": false
+}
+[2025-12-18T22:03:43.468Z] {
+  "etapa": "sucesso",
+  "resultado": "Impressão enviada para RICOH aficio MP 5002: Impressão enviada com sucesso"
+}
