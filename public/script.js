@@ -312,31 +312,77 @@ if (modal) {
 // ETAPA 3 -> ETAPA 4 (agora gera QR e vai para pagamento)
 // ----------------------
 const next3Btn = document.getElementById("next-3");
+let pagamentoId = null; // Armazena o id do pagamento Mercado Pago
 if (next3Btn) {
-  next3Btn.addEventListener("click", () => {
-    // Gera QR para pagamento com o valor atual e mostra na etapa de pagamento (step 4)
+  next3Btn.addEventListener("click", async () => {
     const qrcodeContainer = document.getElementById("qrcode");
     const qrcodeLink = document.getElementById("qrcode-link");
     if (qrcodeContainer) qrcodeContainer.innerHTML = "";
 
     const valorPix = valorImpressao.toFixed(2);
-    const pagamento = `00020126580014BR.GOV.BCB.PIX0136chavepix@seudominio.com5204000053039865406${valorPix}5802BR5920COPIADORA TESTE6009SAO PAULO62070503***6304ABCD`;
+    const descricao = 'Impressão de documentos';
+    const codigo = gerarCodigoImpressao();
 
-    if (qrcodeContainer) {
-      new QRCode(qrcodeContainer, {
-        text: pagamento,
-        width: 200,
-        height: 200,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
+    try {
+      // Chama backend para criar pagamento e obter QR dinâmico
+      const res = await fetch('/api/pagamento/qrcode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ valor: valorPix, descricao, codigo })
       });
+      if (!res.ok) throw new Error('Erro ao gerar QR Code Mercado Pago');
+      const data = await res.json();
+      pagamentoId = data.payment_id;
+      // Gera QR Code com o campo qr_data
+      if (qrcodeContainer) {
+        new QRCode(qrcodeContainer, {
+          text: data.qr_data,
+          width: 200,
+          height: 200,
+          colorDark: "#000000",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H
+        });
+      }
+      if (qrcodeLink) qrcodeLink.innerHTML = `<strong>Pagamento Mercado Pago (R$ ${valorPix}):</strong><br><span>${descricao}</span>`;
+      goToStep(4);
+      // Inicia polling para checar status
+      iniciarPollingPagamento();
+    } catch (err) {
+      alert('Erro ao gerar QR Code Mercado Pago: ' + err.message);
     }
-
-    if (qrcodeLink) qrcodeLink.innerHTML = `<strong>Código PIX (R$ ${valorPix}):</strong><br><span>${pagamento}</span>`;
-
-    goToStep(4);
   });
+}
+
+// Polling para checar status do pagamento
+function iniciarPollingPagamento() {
+  if (!pagamentoId) return;
+  const statusEl = document.getElementById('qrcode-link');
+  let tentativas = 0;
+  const interval = setInterval(async () => {
+    try {
+      const res = await fetch(`/api/pagamento/status/${pagamentoId}`);
+      if (!res.ok) throw new Error('Erro ao consultar status');
+      const data = await res.json();
+      if (data.status === 'approved') {
+        clearInterval(interval);
+        if (statusEl) statusEl.innerHTML += '<br><span style="color:green;font-weight:bold">Pagamento aprovado! Prossiga para impressão.</span>';
+        // Habilita botão de finalizar
+        document.getElementById('finalizar').disabled = false;
+      } else {
+        if (statusEl) statusEl.innerHTML = `<strong>Aguardando pagamento...</strong><br>Status: ${data.status}`;
+        document.getElementById('finalizar').disabled = true;
+      }
+    } catch (e) {
+      if (statusEl) statusEl.innerHTML = `<span style="color:red">Erro ao consultar status do pagamento.</span>`;
+    }
+    tentativas++;
+    if (tentativas > 60) { // timeout após 5 minutos
+      clearInterval(interval);
+      if (statusEl) statusEl.innerHTML += '<br><span style="color:red">Tempo limite atingido. Tente novamente.</span>';
+      document.getElementById('finalizar').disabled = true;
+    }
+  }, 5000);
 }
 
 // ----------------------

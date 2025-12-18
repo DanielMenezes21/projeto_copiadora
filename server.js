@@ -7,17 +7,22 @@ const pdf = require('pdf-parse');
 const printerManager = require('./printer-manager');
 const printService = require('./print-service');
 
-// Definição de caminhos
+const { MercadoPagoConfig, Preference, Payment } = require('mercadopago');
+
+const client = new MercadoPagoConfig({
+  accessToken: 'TEST-3891197388635513-121815-14f3126b4a3e94fed2bba14ab2d7431c-3077287732'
+});
+
+const payment = new Payment(client);
+
 const CONFIG_PATH = path.join(__dirname, "config.json");
 const HISTORIC_PATH = path.join(__dirname, "private", "historic.json");
 const UPLOAD_DIR = path.join(__dirname, 'uploads');
 
-// Criar diretório de uploads se não existir
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR);
 }
 
-// Configurar multer para upload de arquivos
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, UPLOAD_DIR);
@@ -436,8 +441,65 @@ app.post("/api/print", async (req, res) => {
 });
 
 // ============================================================================
-// FIM DAS ROTAS DE GERENCIAMENTO DE IMPRESSORAS
+// ROTAS DE PAGAMENTO MERCADO PAGO
 // ============================================================================
+
+// POST /api/pagamento/qrcode - Cria pagamento PIX e retorna QR code dinâmico
+app.post('/api/pagamento/qrcode', async (req, res) => {
+  try {
+    const { valor, descricao, codigo } = req.body;
+    if (!valor || !descricao || !codigo) {
+      return res.status(400).json({ error: 'Campos obrigatórios: valor, descricao, codigo' });
+    }
+
+    // Novo SDK: criar pagamento PIX
+    const paymentPayload = {
+      transaction_amount: parseFloat(valor),
+      description: descricao,
+      payment_method_id: 'pix',
+      external_reference: codigo,
+      payer: {
+        email: `pagador+${Date.now()}@example.com` // email fake, obrigatório
+      }
+    };
+
+    const result = await payment.create({
+      body: paymentPayload
+    });
+
+    if (!result || !result.point_of_interaction) {
+      throw new Error('Resposta inválida do Mercado Pago');
+    }
+
+    const payment_id = result.id;
+    const qr_data = result.point_of_interaction.transaction_data.qr_code;
+
+    res.json({ payment_id, qr_data });
+  } catch (err) {
+    console.error('Erro ao criar pagamento Mercado Pago:', err);
+    res.status(500).json({ error: 'Erro ao criar pagamento Mercado Pago' });
+  }
+});
+// GET /api/pagamento/status/:id - Consulta status do pagamento
+app.get('/api/pagamento/status/:id', async (req, res) => {
+  try {
+    const paymentId = req.params.id;
+    if (!paymentId) {
+      return res.status(400).json({ error: 'ID do pagamento não informado' });
+    }
+
+    const result = await payment.get({ id: paymentId });
+
+    res.json({
+      status: result.status,
+      status_detail: result.status_detail
+    });
+
+  } catch (err) {
+    console.error('Erro ao consultar status Mercado Pago:', err);
+    res.status(500).json({ error: 'Erro ao consultar status Mercado Pago' });
+  }
+});
 
 // --- Inicialização do servidor ---
 const PORT = 3000;
